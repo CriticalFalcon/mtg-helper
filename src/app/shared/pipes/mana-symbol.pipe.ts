@@ -1,27 +1,38 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
+interface Token {
+    type: 'text' | 'symbol' | 'linebreak';
+    value: string;
+}
 
 @Pipe({
     name: 'manaSymbol'
 })
 export class ManaSymbolPipe implements PipeTransform {
-    constructor(private sanitizer: DomSanitizer) { }
+    transform(text: string | null): Token[] {
+        if (!text) return [];
 
-    transform(text: string | null): SafeHtml {
-        if (!text) return '';
+        const tokens: Token[] = [];
 
-        // Replace each {symbol} with the Scryfall SVG including fixed size attributes
-        const replaced = text.replace(/\{([^}]+)\}/g, (match, symbol) => {
-            // Keep casing, just remove slashes/spaces
-            const formatted = symbol.replace(/\//g, '').replace(/ /g, '');
-            const url = `https://svgs.scryfall.io/card-symbols/${formatted}.svg`;
-            // Added width and height attributes here
-            return `<img src="${url}" alt="${symbol}" class="mana-symbol" width="16" height="16" style="box-shadow: -1px 1px 0 rgba(0,0,0,0.85); margin: 1px 1px -1px 1px;">`;
+        text.split(/\n/).forEach((line, lineIndex, lines) => {
+            // Split on mana symbols {..}
+            const parts = line.split(/(\{[^}]+\})/g).filter(Boolean);
+            for (const part of parts) {
+                if (part.startsWith('{') && part.endsWith('}')) {
+                    // Mana symbol
+                    const formatted = part.replace(/\{|\}|\//g, '').replace(/ /g, '');
+                    tokens.push({ type: 'symbol', value: formatted });
+                } else {
+                    // Plain text
+                    tokens.push({ type: 'text', value: part });
+                }
+            }
+            // Add a line break token if not the last line
+            if (lineIndex < lines.length - 1) {
+                tokens.push({ type: 'linebreak', value: '' });
+            }
         });
 
-        // Replace \n with <br> for line breaks
-        const withBreaks = replaced.replace(/\n/g, '<br>');
-
-        return this.sanitizer.bypassSecurityTrustHtml(withBreaks);
+        return tokens;
     }
 }

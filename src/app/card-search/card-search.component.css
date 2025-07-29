@@ -37,10 +37,6 @@ img {
     margin-top: 1rem;
 }
 
-.mana-symbol svg{
-  width: 18px !important;
-  height: 18px !important;
-  max-width: 18px;
-  vertical-align: middle;
-  margin: 1px 1px -1px 1px
+.card-text {
+    font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }

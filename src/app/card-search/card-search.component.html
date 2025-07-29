@@ -30,11 +30,21 @@
                 <img [src]="cardImage" class="img-fluid rounded shadow" alt="Card Image" />
             </div>
             <!-- Right: Card Details -->
-            <div class="col-md-8 d-flex flex-column justify-content-start">
+            <div class="col-md-8 d-flex flex-column justify-content-start card-text">
                 <h3>{{ cardName }}</h3>
                 <hr>
                 <p class="fw-semibold">{{ typeLine }}</p>
-                <p [innerHTML]="oracleText | manaSymbol"></p>
+                <p>
+                    <ng-container *ngFor="let token of oracleText | manaSymbol">
+                        <ng-container [ngSwitch]="token.type">
+                            <img *ngSwitchCase="'symbol'"
+                                [src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
+                                alt="{{token.value}}" class="mana-symbol">
+                            <span *ngSwitchCase="'text'">{{ token.value }}</span>
+                            <br *ngSwitchCase="'linebreak'">
+                        </ng-container>
+                    </ng-container>
+                </p>
             </div>
         </div>
 
