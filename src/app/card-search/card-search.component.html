@@ -1,0 +1,36 @@
+<div class="container d-flex justify-content-center mt-5">
+    <div class="col-md-6 position-relative">
+        <div class="input-group-container position-relative">
+            <!-- Wrap input + button in a form -->
+            <form (ngSubmit)="searchCard()">
+                <div class="input-group mb-0">
+                    <input type="text" class="form-control" placeholder="Search for a card..." [(ngModel)]="searchTerm"
+                        name="searchTerm" (input)="onInputChange()" (keydown)="handleKeyDown($event)"
+                        (focus)="onInputFocus()" (blur)="onInputBlur()" />
+                    <button type="submit" class="btn btn-primary" tabindex="0">
+                        Search
+                    </button>
+                </div>
+            </form>
+
+            <!-- Suggestions dropdown -->
+            <ul *ngIf="showSuggestions" class="list-group position-absolute w-100 shadow"
+                style="z-index: 1000; top: 100%;">
+                <li *ngFor="let suggestion of suggestions; let i = index" class="list-group-item list-group-item-action"
+                    [class.active]="i === activeIndex" (click)="selectSuggestion(suggestion)">
+                    <span [innerHTML]="suggestion | highlight:userInput"></span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Card Image -->
+        <div class="text-center mt-4" *ngIf="cardImage">
+            <img [src]="cardImage" class="img-fluid rounded shadow" alt="Card Image" />
+        </div>
+
+        <!-- No results / error -->
+        <div class="text-center text-danger mt-3" *ngIf="errorMessage">
+            {{ errorMessage }}
+        </div>
+    </div>
+</div>

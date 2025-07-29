@@ -1,0 +1,30 @@
+.container {
+    margin-top: 80px;
+    /* push down from top */
+}
+
+img {
+    max-width: 336px;
+    height: auto;
+}
+
+.list-group-item {
+    cursor: pointer;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.list-group-item.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.input-group-container {
+    position: relative;
+    z-index: 1;
+    /* ensure relative positioning */
+}
+
+/* Suggestions dropdown already has z-index: 1000 inline */
