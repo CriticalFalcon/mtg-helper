@@ -27,4 +27,20 @@ img {
     /* ensure relative positioning */
 }
 
-/* Suggestions dropdown already has z-index: 1000 inline */
+.row img {
+    max-width: 100%;
+    height: auto;
+}
+
+.row h3 {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.mana-symbol svg{
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  vertical-align: middle;
+  margin: 1px 1px -1px 1px
+}

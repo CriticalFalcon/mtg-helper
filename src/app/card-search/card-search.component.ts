@@ -4,11 +4,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HighlightPipe } from '../shared/pipes/highlight.pipe';
+import { ManaSymbolPipe } from '../shared/pipes/mana-symbol.pipe';
 
 @Component({
     selector: 'app-card-search',
     standalone: true,
-    imports: [CommonModule, FormsModule, HttpClientModule, HighlightPipe],
+    imports: [CommonModule, FormsModule, HttpClientModule, HighlightPipe, ManaSymbolPipe],
     templateUrl: './card-search.component.html',
     styleUrls: ['./card-search.component.css']
 })
@@ -20,6 +21,9 @@ export class CardSearchComponent {
     suggestions: string[] = [];
     showSuggestions: boolean = false;
     activeIndex: number = -1;
+    cardName: string | null = null;
+    typeLine: string | null = null;
+    oracleText: string | null = null;
 
     constructor(private http: HttpClient, private elementRef: ElementRef) { }
 
@@ -43,6 +47,9 @@ export class CardSearchComponent {
                 error: () => {
                     this.suggestions = [];
                     this.showSuggestions = false;
+                    this.cardName = null;
+                    this.typeLine = null;
+                    this.oracleText = null;
                 },
             });
     }
@@ -102,11 +109,16 @@ export class CardSearchComponent {
             .subscribe({
                 next: (data) => {
                     this.cardImage = data.image_uris?.normal || (data.card_faces ? data.card_faces[0].image_uris.normal : null);
+                    this.cardName = data.name;
+                    this.typeLine = data.type_line;
+                    this.oracleText = data.oracle_text;
                     this.errorMessage = null;
                 },
                 error: () => {
                     this.errorMessage = "Card not found. Try again.";
                     this.cardImage = null;
+                    this.typeLine = null;
+                    this.oracleText = null;
                 }
             });
     }

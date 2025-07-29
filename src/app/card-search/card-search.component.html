@@ -1,5 +1,5 @@
 <div class="container d-flex justify-content-center mt-5">
-    <div class="col-md-6 position-relative">
+    <div class="col-md-8 position-relative">
         <div class="input-group-container position-relative">
             <!-- Wrap input + button in a form -->
             <form (ngSubmit)="searchCard()">
@@ -23,9 +23,19 @@
             </ul>
         </div>
 
-        <!-- Card Image -->
-        <div class="text-center mt-4" *ngIf="cardImage">
-            <img [src]="cardImage" class="img-fluid rounded shadow" alt="Card Image" />
+        <!-- Card Info Section -->
+        <div class="row mt-4" *ngIf="cardImage || cardName">
+            <!-- Left: Card Image -->
+            <div class="col-md-4">
+                <img [src]="cardImage" class="img-fluid rounded shadow" alt="Card Image" />
+            </div>
+            <!-- Right: Card Details -->
+            <div class="col-md-8 d-flex flex-column justify-content-start">
+                <h3>{{ cardName }}</h3>
+                <hr>
+                <p class="fw-semibold">{{ typeLine }}</p>
+                <p [innerHTML]="oracleText | manaSymbol"></p>
+            </div>
         </div>
 
         <!-- No results / error -->
