@@ -17,6 +17,7 @@ export class CardSearchComponent {
     userInput: string = '';
     searchTerm: string = '';
     cardImage: string | null = null;
+    hoveredPrintImage: string | null = null; // <-- New
     errorMessage: string | null = null;
     suggestions: string[] = [];
     showSuggestions: boolean = false;
@@ -127,8 +128,8 @@ export class CardSearchComponent {
                     this.typeLine = data.type_line;
                     this.oracleText = data.oracle_text;
                     this.errorMessage = null;
+                    this.prints = [];
 
-                    // Fetch prints
                     if (data.prints_search_uri) {
                         this.http.get<any>(data.prints_search_uri).subscribe({
                             next: (printsData) => {
@@ -147,13 +148,11 @@ export class CardSearchComponent {
                                             imageUrl: p.image_uris!.large
                                         }));
 
-                                // Count duplicates
                                 const nameCounts: Record<string, number> = {};
                                 rawPrints.forEach((p) => {
                                     nameCounts[p.setName] = (nameCounts[p.setName] || 0) + 1;
                                 });
 
-                                // Append collector_number if duplicates
                                 this.prints = rawPrints.map((p) => ({
                                     setName: nameCounts[p.setName] > 1 ? `${p.setName} #${p.collectorNumber}` : p.setName,
                                     imageUrl: p.imageUrl
