@@ -24,12 +24,13 @@ export class CardSearchComponent {
     cardName: string | null = null;
     typeLine: string | null = null;
     oracleText: string | null = null;
+    prints: { setName: string; imageUrl: string }[] = [];
 
     constructor(private http: HttpClient, private elementRef: ElementRef) { }
 
     onInputChange() {
-        this.userInput = this.searchTerm; // track what user types
-        this.activeIndex = -1; // reset active selection on typing
+        this.userInput = this.searchTerm;
+        this.activeIndex = -1;
 
         if (this.userInput.length < 2) {
             this.suggestions = [];
@@ -50,6 +51,7 @@ export class CardSearchComponent {
                     this.cardName = null;
                     this.typeLine = null;
                     this.oracleText = null;
+                    this.prints = [];
                 },
             });
     }
@@ -58,7 +60,6 @@ export class CardSearchComponent {
         if (!this.showSuggestions || this.suggestions.length === 0) return;
 
         if (event.key === 'ArrowDown') {
-            // Move down in suggestions, cycling back to -1 (input box)
             if (this.activeIndex < this.suggestions.length - 1) {
                 this.activeIndex++;
             } else {
@@ -66,8 +67,8 @@ export class CardSearchComponent {
             }
             this.updateSearchTermFromActiveIndex();
             event.preventDefault();
-        } else if (event.key === 'ArrowUp') {
-            // Move up in suggestions, cycling to last if at -1 (input box)
+        }
+        else if (event.key === 'ArrowUp') {
             if (this.activeIndex === -1) {
                 this.activeIndex = this.suggestions.length - 1;
             } else {
@@ -75,7 +76,8 @@ export class CardSearchComponent {
             }
             this.updateSearchTermFromActiveIndex();
             event.preventDefault();
-        } else if (event.key === 'Enter') {
+        }
+        else if (event.key === 'Enter') {
             event.preventDefault();
             if (this.activeIndex >= 0 && this.activeIndex < this.suggestions.length) {
                 this.selectSuggestion(this.suggestions[this.activeIndex]);
@@ -83,11 +85,19 @@ export class CardSearchComponent {
                 this.searchCard();
             }
         }
+        else if (event.key === 'Escape') {
+            event.preventDefault();
+            this.showSuggestions = false;
+            this.activeIndex = -1;
+            this.searchTerm = this.userInput;
+            const input = this.elementRef.nativeElement.querySelector('input');
+            if (input) input.focus();
+        }
     }
 
     selectSuggestion(suggestion: string) {
         this.searchTerm = suggestion;
-        this.userInput = suggestion; // sync user input too
+        this.userInput = suggestion;
         this.suggestions = [];
         this.showSuggestions = false;
         this.activeIndex = -1;
@@ -98,6 +108,10 @@ export class CardSearchComponent {
         if (!this.searchTerm.trim()) {
             this.errorMessage = "Please enter a card name.";
             this.cardImage = null;
+            this.cardName = null;
+            this.typeLine = null;
+            this.oracleText = null;
+            this.prints = [];
             return;
         }
 
@@ -113,17 +127,55 @@ export class CardSearchComponent {
                     this.typeLine = data.type_line;
                     this.oracleText = data.oracle_text;
                     this.errorMessage = null;
+
+                    // Fetch prints
+                    if (data.prints_search_uri) {
+                        this.http.get<any>(data.prints_search_uri).subscribe({
+                            next: (printsData) => {
+                                interface PrintData {
+                                    set_name: string;
+                                    collector_number: string;
+                                    image_uris?: { large: string };
+                                }
+
+                                const rawPrints: { setName: string; collectorNumber: string; imageUrl: string }[] =
+                                    (printsData.data as PrintData[])
+                                        .filter((p) => p.image_uris?.large)
+                                        .map((p) => ({
+                                            setName: p.set_name,
+                                            collectorNumber: p.collector_number,
+                                            imageUrl: p.image_uris!.large
+                                        }));
+
+                                // Count duplicates
+                                const nameCounts: Record<string, number> = {};
+                                rawPrints.forEach((p) => {
+                                    nameCounts[p.setName] = (nameCounts[p.setName] || 0) + 1;
+                                });
+
+                                // Append collector_number if duplicates
+                                this.prints = rawPrints.map((p) => ({
+                                    setName: nameCounts[p.setName] > 1 ? `${p.setName} #${p.collectorNumber}` : p.setName,
+                                    imageUrl: p.imageUrl
+                                }));
+                            },
+                            error: () => this.prints = []
+                        });
+                    } else {
+                        this.prints = [];
+                    }
                 },
                 error: () => {
                     this.errorMessage = "Card not found. Try again.";
                     this.cardImage = null;
+                    this.cardName = null;
                     this.typeLine = null;
                     this.oracleText = null;
+                    this.prints = [];
                 }
             });
     }
 
-    /** Detect clicks outside the component */
     @HostListener('document:click', ['$event'])
     onClickOutside(event: MouseEvent) {
         if (!this.elementRef.nativeElement.contains(event.target)) {
@@ -135,36 +187,22 @@ export class CardSearchComponent {
         if (this.activeIndex >= 0 && this.activeIndex < this.suggestions.length) {
             this.searchTerm = this.suggestions[this.activeIndex];
         } else {
-            // If activeIndex is -1 (no suggestion selected), show what user typed
             this.searchTerm = this.userInput;
         }
     }
 
     onInputFocus() {
-        // Show suggestions if any when focusing input
         if (this.suggestions.length > 0) {
             this.showSuggestions = true;
             this.activeIndex = -1;
-            this.searchTerm = this.userInput; // Reset input text to user input on focus
+            this.searchTerm = this.userInput;
         }
     }
 
     onInputBlur() {
-        // Delay hiding suggestions to allow click event on suggestion to register first
         setTimeout(() => {
             this.showSuggestions = false;
             this.activeIndex = -1;
-        }, 150); // 150ms delay is usually enough, adjust as needed
+        }, 150);
     }
-
-    onSuggestionClick(event: MouseEvent) {
-        const target = event.target as HTMLElement;
-        const li = target.closest('li');
-        if (!li) return;
-        const index = Array.from(li.parentElement!.children).indexOf(li);
-        if (index >= 0 && index < this.suggestions.length) {
-            this.selectSuggestion(this.suggestions[index]);
-        }
-    }
-
 }

@@ -1,7 +1,6 @@
 <div class="container d-flex justify-content-center mt-5">
     <div class="col-md-8 position-relative">
         <div class="input-group-container position-relative">
-            <!-- Wrap input + button in a form -->
             <form (ngSubmit)="searchCard()">
                 <div class="input-group mb-0">
                     <input type="text" class="form-control" placeholder="Search for a card..." [(ngModel)]="searchTerm"
@@ -25,11 +24,9 @@
 
         <!-- Card Info Section -->
         <div class="row mt-4" *ngIf="cardImage || cardName">
-            <!-- Left: Card Image -->
             <div class="col-md-4">
                 <img [src]="cardImage" class="img-fluid rounded shadow" alt="Card Image" />
             </div>
-            <!-- Right: Card Details -->
             <div class="col-md-8 d-flex flex-column justify-content-start card-text">
                 <h3>{{ cardName }}</h3>
                 <hr>
@@ -46,6 +43,16 @@
                     </ng-container>
                 </p>
             </div>
+        </div>
+
+        <!-- Available Prints -->
+        <div class="mt-4" *ngIf="prints.length > 0">
+            <h4>Available Prints</h4>
+            <ul class="list-unstyled">
+                <li *ngFor="let print of prints">
+                    <a [href]="print.imageUrl" target="_blank">{{ print.setName }}</a>
+                </li>
+            </ul>
         </div>
 
         <!-- No results / error -->
