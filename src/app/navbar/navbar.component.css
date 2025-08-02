@@ -1,0 +1,44 @@
+.navbar .list-group-item {
+    cursor: pointer;
+}
+
+.navbar .list-group-item.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* navbar.component.css */
+.list-group {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+form .list-group {
+    width: 100% !important;
+    /* Matches input width */
+}
+
+/* Wrapper to control input size */
+.search-input-wrapper {
+    flex: 1;
+    /* allow it to grow */
+    min-width: 250px;
+    /* default min size */
+    max-width: 400px;
+    /* prevent it from becoming too huge */
+}
+
+/* Input fills wrapper */
+.search-input {
+    width: 100%;
+}
+
+/* Dropdown matches input width */
+.suggestions-dropdown {
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
