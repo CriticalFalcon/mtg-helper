@@ -3,11 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HighlightPipe } from '../shared/pipes/highlight.pipe';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-navbar',
     standalone: true,
-    imports: [CommonModule, FormsModule, HighlightPipe],
+    imports: [CommonModule, FormsModule, HighlightPipe, RouterModule],
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.css']
 })
@@ -18,7 +19,7 @@ export class NavbarComponent {
     showSuggestions: boolean = false;
     activeIndex: number = -1;
 
-    constructor(private http: HttpClient, private elementRef: ElementRef) { }
+    constructor(private http: HttpClient, private elementRef: ElementRef, private router: Router) { }
 
     onInputChange() {
         this.userInput = this.searchTerm;
@@ -107,8 +108,8 @@ export class NavbarComponent {
 
     onSearch() {
         if (!this.searchTerm.trim()) return;
-        // TODO: Navigate or load CardSearchComponent with this.searchTerm
-        console.log('Search for:', this.searchTerm);
+        this.showSuggestions = false;
+        this.router.navigate(['/card', this.searchTerm]);
     }
 
     @HostListener('document:click', ['$event'])

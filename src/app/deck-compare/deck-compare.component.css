@@ -1,0 +1,28 @@
+/* Top input boxes stay fixed */
+.fixed-input {
+    height: 45px;
+}
+
+/* Bottom textareas are taller and scrollable */
+.expandable-textarea {
+    min-height: 200px;
+    resize: vertical;
+    /* allow expansion */
+    overflow-y: auto;
+}
+
+/* Make the two columns split perfectly and fill height */
+html,
+body,
+.container-fluid,
+.row {
+    height: 100%;
+}
+
+.col-md-6 {
+    border-right: 1px solid #dee2e6;
+}
+
+.col-md-6:last-child {
+    border-right: none;
+}

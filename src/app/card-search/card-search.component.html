@@ -1,27 +1,5 @@
-<div class="container d-flex justify-content-center mt-5">
+<div class="container d-flex justify-content-center mt-1">
     <div class="col-md-8 position-relative">
-        <div class="input-group-container position-relative">
-            <form (ngSubmit)="searchCard()">
-                <div class="input-group mb-0">
-                    <input type="text" class="form-control" placeholder="Search for a card..." [(ngModel)]="searchTerm"
-                        name="searchTerm" (input)="onInputChange()" (keydown)="handleKeyDown($event)"
-                        (focus)="onInputFocus()" (blur)="onInputBlur()" />
-                    <button type="submit" class="btn btn-primary" tabindex="0">
-                        Search
-                    </button>
-                </div>
-            </form>
-
-            <!-- Suggestions dropdown -->
-            <ul *ngIf="showSuggestions" class="list-group position-absolute w-100 shadow"
-                style="z-index: 1000; top: 100%;">
-                <li *ngFor="let suggestion of suggestions; let i = index" class="list-group-item list-group-item-action"
-                    [class.active]="i === activeIndex" (click)="selectSuggestion(suggestion)">
-                    <span [innerHTML]="suggestion | highlight:userInput"></span>
-                </li>
-            </ul>
-        </div>
-
         <!-- Card Info Section -->
         <div class="row mt-4" *ngIf="cardImage || cardName">
             <div class="col-md-4">

@@ -22,7 +22,7 @@ form .list-group {
 .search-input-wrapper {
     flex: 1;
     /* allow it to grow */
-    min-width: 250px;
+    min-width: 300px;
     /* default min size */
     max-width: 400px;
     /* prevent it from becoming too huge */
