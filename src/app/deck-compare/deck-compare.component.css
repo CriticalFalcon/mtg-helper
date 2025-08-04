@@ -1,17 +1,25 @@
-/* Top input boxes stay fixed */
+/* Smaller fixed input height */
 .fixed-input {
-    height: 45px;
+    height: 36px;
+    font-size: 0.875rem;
 }
 
-/* Bottom textareas are taller and scrollable */
+/* Smaller font for labels */
+.small-label {
+    font-size: 0.875rem;
+}
+
+/* Slightly smaller textarea, no vertical resize for uniformity */
 .expandable-textarea {
-    min-height: 200px;
-    resize: vertical;
-    /* allow expansion */
-    overflow-y: auto;
+    min-height: 130px;
+    max-height: none;
+    resize: none;
+    font-size: 0.9rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.3;
 }
 
-/* Make the two columns split perfectly and fill height */
+/* Full height container */
 html,
 body,
 .container-fluid,
@@ -19,10 +27,91 @@ body,
     height: 100%;
 }
 
+/* Column styling with subtle border */
 .col-md-6 {
-    border-right: 1px solid #dee2e6;
+    border-right: 1px solid #ddd;
 }
 
 .col-md-6:last-child {
     border-right: none;
+}
+
+/* Group container with subtle background and border */
+.group-container {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+}
+
+/* Group header with smaller font and subtle bottom border */
+.group-header {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #3b82f6aa;
+    padding-bottom: 0.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Smaller, lighter pill badges */
+.group-count {
+    background-color: #3b82f6cc;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+    user-select: none;
+}
+
+/* Card list with no bullets and no scroll */
+.card-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    max-height: none;
+    overflow: visible;
+}
+
+/* Card items with subtle border bottom and clean spacing */
+.card-item {
+    padding: 0.3rem 0.4rem;
+    border-bottom: 1px solid #cbd5e1;
+    font-weight: 500;
+    color: #344054;
+    display: flex;
+    justify-content: flex-start;
+    gap: 6px;
+    font-size: 0.9rem;
+    cursor: default;
+}
+
+/* Remove border for last item in list */
+.card-item:last-child {
+    border-bottom: none;
+}
+
+
+/* Special styling for Commander group */
+.group-header:has(~ .card-list) {
+    /* No built-in CSS "has" widely supported yet, but you can add a separate class if you want special styling */
+}
+
+/* Instead, you can target Commander group container specifically via Angular */
+.group-container.commander {
+    border-color: #f59e0b;
+    /* amber border */
+    background-color: #fff7ed;
+    /* light amber background */
+}
+
+.group-container.commander .group-header {
+    border-bottom-color: #f59e0b;
+    color: #b45309;
 }
