@@ -13,6 +13,26 @@ import { Router, RouterModule } from '@angular/router';
     styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
+    isDarkMode = false;
+
+    ngOnInit() {
+        // Check for saved preference
+        const saved = localStorage.getItem('bsTheme');
+        if (saved === 'dark') {
+            this.isDarkMode = true;
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        } else {
+            this.isDarkMode = false;
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+        }
+    }
+
+    toggleDarkMode() {
+        this.isDarkMode = !this.isDarkMode;
+        const theme = this.isDarkMode ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        localStorage.setItem('bsTheme', theme);
+    }
     searchTerm: string = '';
     userInput: string = '';
     suggestions: string[] = [];

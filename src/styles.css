@@ -1,3 +1,53 @@
+/* Dark mode styling */
+html[data-bs-theme="dark"] .group-container {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+}
+
+html[data-bs-theme="dark"] .group-container.commander {
+    background-color: #3b2f1d;
+    border-color: #b45309;
+}
+
+html[data-bs-theme="dark"] .group-container.sideboard {
+    background-color: #2d2d2d;
+    border-color: #3f3f3f;
+    opacity: 0.9;
+}
+
+html[data-bs-theme="dark"] .group-header {
+    color: #e2e8f0;
+    border-bottom-color: #3b82f6aa;
+}
+
+html[data-bs-theme="dark"] .group-container.commander .group-header {
+    color: #fbbf24;
+    border-bottom-color: #b45309;
+}
+
+html[data-bs-theme="dark"] .card-item {
+    color: #f1f5f9;
+    border-bottom: 1px solid #475569;
+}
+
+html[data-bs-theme="dark"] .group-count {
+    background-color: #3b82f6;
+    color: #f1f5f9;
+}
+
+/* Dark mode: add a subtle glow */
+html[data-bs-theme="dark"] .card-preview {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Light mode: keep it simple */
+html[data-bs-theme="light"] .card-preview {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
 .mana-symbol {
     width: 15px;
     height: 15px;
@@ -6,5 +56,3 @@
     box-shadow: -1px 1px 0 rgba(0, 0, 0, 0.85);
     border-radius: 500px;
 }
-
-/* You can add global styles to this file, and also import other style files */

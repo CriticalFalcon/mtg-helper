@@ -14,6 +14,7 @@
                     <a class="nav-link" routerLink="/compare" routerLinkActive="active">Compare</a>
                 </li>
             </ul>
+
             <form class="d-flex flex-nowrap align-items-start position-relative" role="search" (ngSubmit)="onSearch()">
                 <div class="position-relative search-input-wrapper me-2">
                     <input class="form-control search-input" type="search" placeholder="Search" [(ngModel)]="searchTerm"
@@ -27,7 +28,11 @@
                         </li>
                     </ul>
                 </div>
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <button type="button" class="btn btn-primary me-2" type="submit">Search</button>
+                <button type="button" class="btn btn-outline-secondary dark-toggle-btn" (click)="toggleDarkMode()" [attr.aria-pressed]="isDarkMode" title="Toggle dark mode">
+                    <span *ngIf="!isDarkMode" class="bi bi-moon-fill"></span>
+                    <span *ngIf="isDarkMode" class="bi bi-sun-fill"></span>
+                </button>
             </form>
 
         </div>

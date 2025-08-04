@@ -21,7 +21,7 @@
                     <li *ngFor="let card of leftGroupedCards[group]" class="card-item"
                         (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
                         <span>{{ card.count }}x {{ card.name }}</span>
-                        <span class="status-circle"
+                        <span *ngIf="group !== 'Sideboard'" class="status-circle"
                             [ngClass]="cardExistsOnSide(card.name, 'left') ? 'circle-green' : 'circle-yellow'">
                         </span>
                     </li>
@@ -50,7 +50,7 @@
                     <li *ngFor="let card of rightGroupedCards[group]" class="card-item"
                         (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
                         <span>{{ card.count }}x {{ card.name }}</span>
-                        <span class="status-circle"
+                        <span *ngIf="group !== 'Sideboard'" class="status-circle"
                             [ngClass]="cardExistsOnSide(card.name, 'right') ? 'circle-green' : 'circle-yellow'">
                         </span>
                     </li>
