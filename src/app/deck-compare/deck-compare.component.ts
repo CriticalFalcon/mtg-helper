@@ -24,82 +24,181 @@ export class DeckCompareComponent {
     constructor(private http: HttpClient) { }
 
     processDecklist(rawList: string, side: 'left' | 'right') {
-        const lines = rawList.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        const allLines = rawList
+            .split('\n')
+            .map(l => l.trim())
+            .filter(l => l.length > 0);
 
-        // Determine if commander deck by length
-        const isCommanderDeck = lines.length >= 100;
+        if (allLines.length === 0) return;
 
-        // Extract commander card name if commander deck
-        let commanderName = '';
-        if (isCommanderDeck) {
-            // Parse last line's card name similarly to others
-            const lastLine = lines[lines.length - 1];
-            const match = lastLine.match(/^(\d+)x?\s+(.+)$/i);
-            commanderName = match ? match[2] : lastLine;
-            commanderName = commanderName.trim().toLowerCase();
+        // Determine format: Archidekt if any line matches Archidekt pattern, else Moxfield style
+        const isArchidekt = allLines.some(line => /\^.*\{.*\}.*\^/.test(line) || /\[.*\]/.test(line));
+
+        if (isArchidekt) {
+            this.processArchidektDeck(allLines, side);
+        } else {
+            this.processMoxfieldDeck(allLines, side);
+        }
+    }
+
+    private processMoxfieldDeck(allLines: string[], side: 'left' | 'right') {
+        const sideboardIndex = allLines.findIndex(line => /^sideboard:?$/i.test(line));
+        const grouped: GroupedCards = {};
+
+        if (sideboardIndex !== -1) {
+            const mainDeckLines = allLines.slice(0, sideboardIndex);
+            const sideboardPlusCommanderLines = allLines.slice(sideboardIndex + 1);
+
+            // Commander is last line
+            const commanderLine = sideboardPlusCommanderLines.pop() || null;
+            const sideboardLines = sideboardPlusCommanderLines;
+
+            const mainCounts = this.parseCardCounts(mainDeckLines);
+            const sideboardCounts = this.parseCardCounts(sideboardLines);
+
+            this.addCardsFromCounts(mainCounts, grouped, side);
+            this.addCardsFromCounts(sideboardCounts, grouped, side, 'Sideboard');
+
+            if (commanderLine) {
+                const cleanCommanderName = commanderLine.replace(/^(\d+)x?\s+/i, '').trim();
+                if (!grouped['Commander']) grouped['Commander'] = [];
+                grouped['Commander'].push({ name: cleanCommanderName, count: 1 });
+            }
+
+            this.updateGroupedCards(side, grouped);
+        } else {
+            // No sideboard; last line is commander
+            const mainDeckLines = [...allLines];
+            const commanderLine = mainDeckLines.pop() || null;
+
+            const mainCounts = this.parseCardCounts(mainDeckLines);
+            this.addCardsFromCounts(mainCounts, grouped, side);
+
+            if (commanderLine) {
+                const cleanCommanderName = commanderLine.replace(/^(\d+)x?\s+/i, '').trim();
+                if (!grouped['Commander']) grouped['Commander'] = [];
+                grouped['Commander'].push({ name: cleanCommanderName, count: 1 });
+            }
+
+            this.updateGroupedCards(side, grouped);
+        }
+    }
+
+    private processArchidektDeck(allLines: string[], side: 'left' | 'right') {
+        const grouped: GroupedCards = {};
+        const mainLines: string[] = [];
+        const sideboardLines: string[] = [];
+        let commanderLine: string | null = null;
+
+        for (const line of allLines) {
+            let count = 1;
+            let namePart = line;
+            const countMatch = line.match(/^(\d+)x?\s+/i);
+            if (countMatch) {
+                count = parseInt(countMatch[1], 10);
+                namePart = line.substring(countMatch[0].length);
+            }
+
+            // Extract clean card name before any set/brackets/extra tags
+            let cardName = namePart.split(/[\(\[\^]/)[0].trim();
+
+            const isCommander = /\bCommander\b/i.test(line);
+            const isSideboard = /\b(Maybeboard|noDeck)\b/i.test(line); // updated to detect noDeck too
+
+            if (isCommander) {
+                commanderLine = `${count} ${cardName}`;
+            } else if (isSideboard) {
+                sideboardLines.push(`${count} ${cardName}`);
+            } else {
+                mainLines.push(`${count} ${cardName}`);
+            }
         }
 
-        const cardCounts: { [name: string]: number } = {};
+        const mainCounts = this.parseCardCounts(mainLines);
+        const sideboardCounts = this.parseCardCounts(sideboardLines);
 
-        for (const line of lines) {
+        this.addCardsFromCounts(mainCounts, grouped, side);
+        this.addCardsFromCounts(sideboardCounts, grouped, side, 'Sideboard');
+
+        if (commanderLine) {
+            const cleanCommanderName = commanderLine.replace(/^(\d+)x?\s+/i, '').trim();
+            if (!grouped['Commander']) grouped['Commander'] = [];
+            grouped['Commander'].push({ name: cleanCommanderName, count: 1 });
+        }
+
+        this.updateGroupedCards(side, grouped);
+    }
+
+    private parseCardCounts(list: string[]): { [name: string]: number } {
+        const counts: { [name: string]: number } = {};
+        for (const line of list) {
             const match = line.match(/^(\d+)x?\s+(.+)$/i);
             if (match) {
                 const count = parseInt(match[1], 10);
                 const name = match[2];
-                cardCounts[name] = (cardCounts[name] || 0) + count;
+                counts[name] = (counts[name] || 0) + count;
             } else {
-                cardCounts[line] = (cardCounts[line] || 0) + 1;
+                counts[line] = (counts[line] || 0) + 1;
             }
         }
+        return counts;
+    }
 
-        const grouped: GroupedCards = {};
-        Object.keys(cardCounts).forEach(cardName => {
-            this.http.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
+    private addCardsFromCounts(
+        counts: { [name: string]: number },
+        grouped: GroupedCards,
+        side: 'left' | 'right',
+        groupOverride?: string
+    ) {
+        let pending = Object.keys(counts).length;
+        if (pending === 0) {
+            this.updateGroupedCards(side, grouped);
+            return;
+        }
+        Object.keys(counts).forEach(cardName => {
+            this.http
+                .get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
                 .subscribe({
                     next: data => {
                         const typeLine = data.card_faces?.[0]?.type_line || data.type_line || 'Other';
-                        let group = this.mapTypeToGroup(typeLine);
-
-                        // If commander deck and this card is commander, override group
-                        if (isCommanderDeck && cardName.toLowerCase() === commanderName) {
-                            group = 'Commander';
-                        }
-
+                        const group = groupOverride || this.mapTypeToGroup(typeLine);
                         if (!grouped[group]) grouped[group] = [];
 
-                        // Merge duplicates (case-insensitive)
                         const existing = grouped[group].find(c => c.name.toLowerCase() === data.name.toLowerCase());
                         if (existing) {
-                            existing.count += cardCounts[cardName];
+                            existing.count += counts[cardName];
                         } else {
-                            grouped[group].push({ name: data.name, count: cardCounts[cardName] });
+                            grouped[group].push({ name: data.name, count: counts[cardName] });
                         }
 
-                        if (side === 'left') {
-                            this.leftGroupedCards = this.sortGroups(grouped);
-                        } else {
-                            this.rightGroupedCards = this.sortGroups(grouped);
+                        if (--pending === 0) {
+                            this.updateGroupedCards(side, grouped);
                         }
                     },
                     error: () => {
-                        const group = 'Unknown';
+                        const group = groupOverride || 'Unknown';
                         if (!grouped[group]) grouped[group] = [];
-
                         const existing = grouped[group].find(c => c.name.toLowerCase() === cardName.toLowerCase());
                         if (existing) {
-                            existing.count += cardCounts[cardName];
+                            existing.count += counts[cardName];
                         } else {
-                            grouped[group].push({ name: cardName, count: cardCounts[cardName] });
+                            grouped[group].push({ name: cardName, count: counts[cardName] });
                         }
 
-                        if (side === 'left') {
-                            this.leftGroupedCards = this.sortGroups(grouped);
-                        } else {
-                            this.rightGroupedCards = this.sortGroups(grouped);
+                        if (--pending === 0) {
+                            this.updateGroupedCards(side, grouped);
                         }
                     }
                 });
         });
+    }
+
+    private updateGroupedCards(side: 'left' | 'right', grouped: GroupedCards) {
+        if (side === 'left') {
+            this.leftGroupedCards = this.sortGroups(grouped);
+        } else {
+            this.rightGroupedCards = this.sortGroups(grouped);
+        }
     }
 
     mapTypeToGroup(typeLine: string): string {
@@ -115,7 +214,20 @@ export class DeckCompareComponent {
     }
 
     sortGroups(groups: GroupedCards): GroupedCards {
-        const order = ['Commander', 'Battles', 'Planeswalkers', 'Creatures', 'Sorceries', 'Instants', 'Artifacts', 'Enchantments', 'Lands', 'Other', 'Unknown'];
+        const order = [
+            'Commander',
+            'Battles',
+            'Planeswalkers',
+            'Creatures',
+            'Sorceries',
+            'Instants',
+            'Artifacts',
+            'Enchantments',
+            'Lands',
+            'Other',
+            'Unknown',
+            'Sideboard'
+        ];
         const sorted: GroupedCards = {};
         order.forEach(type => {
             if (groups[type]) {

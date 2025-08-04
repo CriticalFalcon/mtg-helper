@@ -2,19 +2,11 @@
     <div class="row h-100">
         <!-- Left Column -->
         <div class="col-md-6 d-flex flex-column p-3">
-            <!-- Deck URL Input -->
-            <div class="mb-2">
-                <label for="leftDeckUrl" class="form-label fw-semibold small-label">Decklist URL (Moxfield or
-                    Archidekt)</label>
-                <input type="url" id="leftDeckUrl" class="form-control fixed-input" placeholder="Enter decklist URL"
-                    autocomplete="off" />
-            </div>
-
             <!-- Raw Decklist Input -->
             <div class="mb-4">
-                <label for="leftRawDecklist" class="form-label fw-semibold small-label">Or Paste Raw Decklist</label>
+                <label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
                 <textarea id="leftRawDecklist" [(ngModel)]="leftDeckText" class="form-control expandable-textarea"
-                    placeholder="Paste raw decklist here" rows="6"></textarea>
+                    placeholder="Paste here" rows="6"></textarea>
                 <button class="btn btn-primary mt-3 btn-sm" (click)="processDecklist(leftDeckText, 'left')">
                     Process Left Deck
                 </button>
@@ -22,7 +14,7 @@
 
             <!-- Grouped Cards -->
             <div *ngFor="let group of getGroupKeys('left')" [class.commander]="group === 'Commander'"
-                class="group-container mt-3">
+                [class.sideboard]="group === 'Sideboard'" class="group-container mt-3">
                 <div class="group-header">
                     {{ group }}
                     <span class="group-count">{{ getGroupCount('left', group) }}</span>
@@ -37,19 +29,11 @@
 
         <!-- Right Column -->
         <div class="col-md-6 d-flex flex-column p-3">
-            <!-- Deck URL Input -->
-            <div class="mb-2">
-                <label for="rightDeckUrl" class="form-label fw-semibold small-label">Decklist URL (Moxfield or
-                    Archidekt)</label>
-                <input type="url" id="rightDeckUrl" class="form-control fixed-input" placeholder="Enter decklist URL"
-                    autocomplete="off" />
-            </div>
-
             <!-- Raw Decklist Input -->
             <div class="mb-4">
-                <label for="rightRawDecklist" class="form-label fw-semibold small-label">Or Paste Raw Decklist</label>
+                <label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
                 <textarea id="rightRawDecklist" [(ngModel)]="rightDeckText" class="form-control expandable-textarea"
-                    placeholder="Paste raw decklist here" rows="6"></textarea>
+                    placeholder="Paste here" rows="6"></textarea>
                 <button class="btn btn-primary mt-3 btn-sm" (click)="processDecklist(rightDeckText, 'right')">
                     Process Right Deck
                 </button>
@@ -57,7 +41,7 @@
 
             <!-- Grouped Cards -->
             <div *ngFor="let group of getGroupKeys('right')" [class.commander]="group === 'Commander'"
-                class="group-container mt-3">
+                [class.sideboard]="group === 'Sideboard'" class="group-container mt-3">
                 <div class="group-header">
                     {{ group }}
                     <span class="group-count">{{ getGroupCount('right', group) }}</span>

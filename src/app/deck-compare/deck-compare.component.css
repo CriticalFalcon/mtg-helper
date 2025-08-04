@@ -115,3 +115,74 @@ body,
     border-bottom-color: #f59e0b;
     color: #b45309;
 }
+
+/* Sideboard group styling */
+.group-container.sideboard {
+    background-color: #f5f5f5;
+    /* slightly muted gray */
+    border: 1px solid #d1d5db;
+    opacity: 0.85;
+}
+
+.group-container.sideboard .group-header {
+    color: #6b7280;
+    /* muted header */
+}
+
+.group-container.sideboard .card-item {
+    color: #6b7280;
+    /* muted card text */
+}
+
+.deck-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 30px;
+    margin-top: 2rem;
+}
+
+.deck-row {
+    display: contents;
+}
+
+.deck-column {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.8rem;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+    min-height: 100px;
+}
+
+.deck-column.commander {
+    border-color: #f59e0b;
+    background-color: #fff7ed;
+}
+
+.deck-column.sideboard {
+    background-color: #f5f5f5;
+    opacity: 0.85;
+}
+
+.group-header {
+    font-weight: 600;
+    font-size: 1rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #3b82f6aa;
+    padding-bottom: 0.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.group-count {
+    background-color: #3b82f6cc;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+    user-select: none;
+}
