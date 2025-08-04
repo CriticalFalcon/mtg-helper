@@ -9,7 +9,7 @@
     font-size: 0.875rem;
 }
 
-/* Slightly smaller textarea, no vertical resize for uniformity */
+/* Slightly smaller textarea */
 .expandable-textarea {
     min-height: 130px;
     max-height: none;
@@ -27,7 +27,7 @@ body,
     height: 100%;
 }
 
-/* Column styling with subtle border */
+/* Column styling */
 .col-md-6 {
     border-right: 1px solid #ddd;
 }
@@ -36,7 +36,7 @@ body,
     border-right: none;
 }
 
-/* Group container with subtle background and border */
+/* Group container */
 .group-container {
     background-color: #f3f4f6;
     border: 1px solid #d1d5db;
@@ -46,7 +46,7 @@ body,
     box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
 }
 
-/* Group header with smaller font and subtle bottom border */
+/* Group header */
 .group-header {
     font-weight: 600;
     font-size: 1rem;
@@ -59,7 +59,7 @@ body,
     align-items: center;
 }
 
-/* Smaller, lighter pill badges */
+/* Group count badge */
 .group-count {
     background-color: #3b82f6cc;
     color: white;
@@ -70,45 +70,49 @@ body,
     user-select: none;
 }
 
-/* Card list with no bullets and no scroll */
+/* Card list */
 .card-list {
     list-style: none;
     padding-left: 0;
     margin: 0;
-    max-height: none;
-    overflow: visible;
 }
 
-/* Card items with subtle border bottom and clean spacing */
+/* Card item */
 .card-item {
     padding: 0.3rem 0.4rem;
     border-bottom: 1px solid #cbd5e1;
     font-weight: 500;
     color: #344054;
     display: flex;
-    justify-content: flex-start;
+    align-items: center;
     gap: 6px;
     font-size: 0.9rem;
-    cursor: default;
 }
 
-/* Remove border for last item in list */
 .card-item:last-child {
     border-bottom: none;
 }
 
-
-/* Special styling for Commander group */
-.group-header:has(~ .card-list) {
-    /* No built-in CSS "has" widely supported yet, but you can add a separate class if you want special styling */
+/* Status circles */
+.status-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-left: auto;
 }
 
-/* Instead, you can target Commander group container specifically via Angular */
+.circle-green {
+    background-color: #10b981;
+}
+
+.circle-yellow {
+    background-color: #facc15;
+}
+
+/* Commander and Sideboard styles */
 .group-container.commander {
     border-color: #f59e0b;
-    /* amber border */
     background-color: #fff7ed;
-    /* light amber background */
 }
 
 .group-container.commander .group-header {
@@ -116,73 +120,27 @@ body,
     color: #b45309;
 }
 
-/* Sideboard group styling */
 .group-container.sideboard {
     background-color: #f5f5f5;
-    /* slightly muted gray */
     border: 1px solid #d1d5db;
     opacity: 0.85;
 }
 
 .group-container.sideboard .group-header {
     color: #6b7280;
-    /* muted header */
 }
 
 .group-container.sideboard .card-item {
     color: #6b7280;
-    /* muted card text */
 }
 
-.deck-compare-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px 30px;
-    margin-top: 2rem;
-}
-
-.deck-row {
-    display: contents;
-}
-
-.deck-column {
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
+/* Floating card preview */
+.card-preview {
+    position: fixed;
+    width: 250px;
+    pointer-events: none;
+    z-index: 9999;
+    border: 1px solid #ccc;
     border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0.8rem;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
-    min-height: 100px;
-}
-
-.deck-column.commander {
-    border-color: #f59e0b;
-    background-color: #fff7ed;
-}
-
-.deck-column.sideboard {
-    background-color: #f5f5f5;
-    opacity: 0.85;
-}
-
-.group-header {
-    font-weight: 600;
-    font-size: 1rem;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-    border-bottom: 1px solid #3b82f6aa;
-    padding-bottom: 0.2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.group-count {
-    background-color: #3b82f6cc;
-    color: white;
-    font-weight: 600;
-    font-size: 0.75rem;
-    padding: 0.1rem 0.5rem;
-    border-radius: 9999px;
-    user-select: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }

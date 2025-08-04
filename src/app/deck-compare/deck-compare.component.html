@@ -2,7 +2,6 @@
     <div class="row h-100">
         <!-- Left Column -->
         <div class="col-md-6 d-flex flex-column p-3">
-            <!-- Raw Decklist Input -->
             <div class="mb-4">
                 <label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
                 <textarea id="leftRawDecklist" [(ngModel)]="leftDeckText" class="form-control expandable-textarea"
@@ -12,7 +11,6 @@
                 </button>
             </div>
 
-            <!-- Grouped Cards -->
             <div *ngFor="let group of getGroupKeys('left')" [class.commander]="group === 'Commander'"
                 [class.sideboard]="group === 'Sideboard'" class="group-container mt-3">
                 <div class="group-header">
@@ -20,8 +18,12 @@
                     <span class="group-count">{{ getGroupCount('left', group) }}</span>
                 </div>
                 <ul class="card-list">
-                    <li *ngFor="let card of leftGroupedCards[group]" class="card-item">
+                    <li *ngFor="let card of leftGroupedCards[group]" class="card-item"
+                        (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
                         <span>{{ card.count }}x {{ card.name }}</span>
+                        <span class="status-circle"
+                            [ngClass]="cardExistsOnSide(card.name, 'left') ? 'circle-green' : 'circle-yellow'">
+                        </span>
                     </li>
                 </ul>
             </div>
@@ -29,7 +31,6 @@
 
         <!-- Right Column -->
         <div class="col-md-6 d-flex flex-column p-3">
-            <!-- Raw Decklist Input -->
             <div class="mb-4">
                 <label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
                 <textarea id="rightRawDecklist" [(ngModel)]="rightDeckText" class="form-control expandable-textarea"
@@ -39,7 +40,6 @@
                 </button>
             </div>
 
-            <!-- Grouped Cards -->
             <div *ngFor="let group of getGroupKeys('right')" [class.commander]="group === 'Commander'"
                 [class.sideboard]="group === 'Sideboard'" class="group-container mt-3">
                 <div class="group-header">
@@ -47,11 +47,19 @@
                     <span class="group-count">{{ getGroupCount('right', group) }}</span>
                 </div>
                 <ul class="card-list">
-                    <li *ngFor="let card of rightGroupedCards[group]" class="card-item">
+                    <li *ngFor="let card of rightGroupedCards[group]" class="card-item"
+                        (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
                         <span>{{ card.count }}x {{ card.name }}</span>
+                        <span class="status-circle"
+                            [ngClass]="cardExistsOnSide(card.name, 'right') ? 'circle-green' : 'circle-yellow'">
+                        </span>
                     </li>
                 </ul>
             </div>
         </div>
     </div>
+
+    <!-- Floating card image -->
+    <img *ngIf="hoveredCardImage" [src]="hoveredCardImage" class="card-preview" [style.left.px]="hoverCardPosition.x"
+        [style.top.px]="hoverCardPosition.y">
 </div>

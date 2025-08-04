@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -21,7 +21,54 @@ export class DeckCompareComponent {
     leftGroupedCards: GroupedCards = {};
     rightGroupedCards: GroupedCards = {};
 
+    // Hover preview state
+    hoveredCardImage: string | null = null;
+    hoverCardPosition = { x: 0, y: 0 };
+
     constructor(private http: HttpClient) { }
+
+    // Track mouse position globally so the image follows
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(event: MouseEvent) {
+        const imageWidth = 250;  // estimated card width
+        const imageHeight = 350; // estimated card height
+        const offsetX = 30;
+        const offsetY = -20;
+
+        // Calculate position
+        let x = event.clientX + offsetX;
+        let y = event.clientY + offsetY;
+
+        // Clamp X so the image doesn't go off the right edge
+        if (x + imageWidth > window.innerWidth) {
+            x = window.innerWidth - imageWidth - 10;
+        }
+
+        // Clamp Y so the image stays in the viewport (top/bottom)
+        if (y < 0) {
+            y = 10; // minimum margin from top
+        } else if (y + imageHeight > window.innerHeight) {
+            y = window.innerHeight - imageHeight - 10;
+        }
+
+        this.hoverCardPosition = { x, y };
+    }
+
+    onCardHover(cardName: string) {
+        // Fetch Scryfall image
+        this.http.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`).subscribe({
+            next: data => {
+                this.hoveredCardImage = data.image_uris?.normal || data.card_faces?.[0]?.image_uris?.normal || null;
+            },
+            error: () => {
+                this.hoveredCardImage = null;
+            }
+        });
+    }
+
+    onCardLeave() {
+        this.hoveredCardImage = null;
+    }
 
     processDecklist(rawList: string, side: 'left' | 'right') {
         const allLines = rawList
@@ -31,7 +78,6 @@ export class DeckCompareComponent {
 
         if (allLines.length === 0) return;
 
-        // Determine format: Archidekt if any line matches Archidekt pattern, else Moxfield style
         const isArchidekt = allLines.some(line => /\^.*\{.*\}.*\^/.test(line) || /\[.*\]/.test(line));
 
         if (isArchidekt) {
@@ -48,8 +94,6 @@ export class DeckCompareComponent {
         if (sideboardIndex !== -1) {
             const mainDeckLines = allLines.slice(0, sideboardIndex);
             const sideboardPlusCommanderLines = allLines.slice(sideboardIndex + 1);
-
-            // Commander is last line
             const commanderLine = sideboardPlusCommanderLines.pop() || null;
             const sideboardLines = sideboardPlusCommanderLines;
 
@@ -67,7 +111,6 @@ export class DeckCompareComponent {
 
             this.updateGroupedCards(side, grouped);
         } else {
-            // No sideboard; last line is commander
             const mainDeckLines = [...allLines];
             const commanderLine = mainDeckLines.pop() || null;
 
@@ -99,11 +142,9 @@ export class DeckCompareComponent {
                 namePart = line.substring(countMatch[0].length);
             }
 
-            // Extract clean card name before any set/brackets/extra tags
             let cardName = namePart.split(/[\(\[\^]/)[0].trim();
-
             const isCommander = /\bCommander\b/i.test(line);
-            const isSideboard = /\b(Maybeboard|noDeck)\b/i.test(line); // updated to detect noDeck too
+            const isSideboard = /\b(Maybeboard|noDeck)\b/i.test(line);
 
             if (isCommander) {
                 commanderLine = `${count} ${cardName}`;
@@ -244,5 +285,12 @@ export class DeckCompareComponent {
     getGroupCount(side: 'left' | 'right', group: string): number {
         const data = side === 'left' ? this.leftGroupedCards : this.rightGroupedCards;
         return data[group]?.reduce((acc, c) => acc + c.count, 0) || 0;
+    }
+
+    cardExistsOnSide(cardName: string, side: 'left' | 'right'): boolean {
+        const grouped = side === 'left' ? this.rightGroupedCards : this.leftGroupedCards;
+        return Object.values(grouped).some(cards =>
+            cards.some(c => c.name.toLowerCase() === cardName.toLowerCase())
+        );
     }
 }
