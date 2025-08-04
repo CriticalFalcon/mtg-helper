@@ -1,33 +1,83 @@
-/* Dark mode toggle button */
+/* Modern circular dark mode toggle */
 .dark-toggle-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
+    height: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
     border-radius: 50%;
-    margin-left: 8px;
-    font-size: 1.2rem;
-    transition: background 0.2s;
-}
-.dark-toggle-btn[aria-pressed="true"] {
-    background: #222;
-    color: #ffd700;
-    border-color: #ffd700;
-}
-.dark-toggle-btn[aria-pressed="false"] {
-    background: #fff;
-    color: #222;
-}
-.dark-toggle-btn .bi {
+    border: 1.5px solid #94a3b8;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 1.25rem;
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    animation: pulseLight 4s infinite ease-in-out;
     vertical-align: middle;
-    font-size: 1.35rem;
 }
-/* Bootstrap icons (if not already included) */
-@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css');
+
+/* Hover effect */
+.dark-toggle-btn:hover {
+    background: #f0f4f8;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    transform: scale(1.05);
+    color: #64748b;
+    transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease, color 0.3s ease;
+}
+
+/* Active (dark mode on) */
+.dark-toggle-btn.active {
+    background: #1f2937;
+    color: #facc15;
+    border-color: #facc15;
+    box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+    animation: glowPulse 4s infinite ease-in-out;
+    animation-name: glowPulse;
+}
+
+/* Icon animation */
+.dark-toggle-btn i {
+    transition: transform 0.4s ease;
+}
+
+.dark-toggle-btn.active i {
+    transform: rotate(360deg);
+}
+
+/* Softer, slower breathing glow for dark mode */
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 6px rgba(250, 204, 21, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+    }
+}
+
+/* Light mode subtle pulse keyframes */
+@keyframes pulseLight {
+
+    0%,
+    100% {
+        box-shadow: 0 0 5px rgba(100, 116, 139, 0.15);
+    }
+
+    50% {
+        box-shadow: 0 0 12px rgba(100, 116, 139, 0.3);
+    }
+}
+
 
 /* Bootstrap icons (if not already included) */
 @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css');
+
 .navbar .list-group-item {
     cursor: pointer;
 }
@@ -67,4 +117,9 @@ form .list-group {
     z-index: 1000;
     max-height: 300px;
     overflow-y: auto;
+}
+
+/* Ensure the small screen toggle + hamburger sit flush left with proper spacing */
+.d-lg-none.d-flex {
+    gap: 0.25rem;
 }
