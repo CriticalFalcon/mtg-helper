@@ -3,7 +3,7 @@
         <!-- Card Info Section -->
         <div class="row mt-4" *ngIf="cardImage || cardName">
             <div class="col-md-4">
-                <img [src]="hoveredPrintImage || cardImage" class="img-fluid rounded shadow main-card-img" alt="Card Image" />
+                <img [src]="hoveredPrintImage || cardImage" class="img-fluid shadow main-card-img" alt="Card Image" />
             </div>
             <div class="col-md-8 d-flex flex-column justify-content-start card-text">
                 <h3>{{ cardName }}</h3>

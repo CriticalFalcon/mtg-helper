@@ -5,6 +5,7 @@
 img {
     max-width: 336px;
     height: auto;
+    border-radius: 12px;
 }
 
 .list-group-item {

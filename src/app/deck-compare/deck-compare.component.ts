@@ -12,7 +12,7 @@ interface GroupedCards {
     standalone: true,
     imports: [CommonModule, FormsModule, HttpClientModule],
     templateUrl: './deck-compare.component.html',
-    styleUrls: ['./deck-compare.component.css']
+    styleUrls: ['./deck-compare.component.css'],
 })
 export class DeckCompareComponent {
     leftDeckText: string = '';
@@ -25,28 +25,28 @@ export class DeckCompareComponent {
     hoveredCardImage: string | null = null;
     hoverCardPosition = { x: 0, y: 0 };
 
+    // Toggle for showing only differences
+    showDifferencesOnly = false;
+
     constructor(private http: HttpClient) { }
 
     // Track mouse position globally so the image follows
     @HostListener('document:mousemove', ['$event'])
     onMouseMove(event: MouseEvent) {
-        const imageWidth = 250;  // estimated card width
+        const imageWidth = 250; // estimated card width
         const imageHeight = 350; // estimated card height
         const offsetX = 30;
         const offsetY = -20;
 
-        // Calculate position
         let x = event.clientX + offsetX;
         let y = event.clientY + offsetY;
 
-        // Clamp X so the image doesn't go off the right edge
         if (x + imageWidth > window.innerWidth) {
             x = window.innerWidth - imageWidth - 10;
         }
 
-        // Clamp Y so the image stays in the viewport (top/bottom)
         if (y < 0) {
-            y = 10; // minimum margin from top
+            y = 10;
         } else if (y + imageHeight > window.innerHeight) {
             y = window.innerHeight - imageHeight - 10;
         }
@@ -55,15 +55,17 @@ export class DeckCompareComponent {
     }
 
     onCardHover(cardName: string) {
-        // Fetch Scryfall image
-        this.http.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`).subscribe({
-            next: data => {
-                this.hoveredCardImage = data.image_uris?.normal || data.card_faces?.[0]?.image_uris?.normal || null;
-            },
-            error: () => {
-                this.hoveredCardImage = null;
-            }
-        });
+        this.http
+            .get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
+            .subscribe({
+                next: (data) => {
+                    this.hoveredCardImage =
+                        data.image_uris?.normal || data.card_faces?.[0]?.image_uris?.normal || null;
+                },
+                error: () => {
+                    this.hoveredCardImage = null;
+                },
+            });
     }
 
     onCardLeave() {
@@ -73,12 +75,12 @@ export class DeckCompareComponent {
     processDecklist(rawList: string, side: 'left' | 'right') {
         const allLines = rawList
             .split('\n')
-            .map(l => l.trim())
-            .filter(l => l.length > 0);
+            .map((l) => l.trim())
+            .filter((l) => l.length > 0);
 
         if (allLines.length === 0) return;
 
-        const isArchidekt = allLines.some(line => /\^.*\{.*\}.*\^/.test(line) || /\[.*\]/.test(line));
+        const isArchidekt = allLines.some((line) => /\^.*\{.*\}.*\^/.test(line) || /\[.*\]/.test(line));
 
         if (isArchidekt) {
             this.processArchidektDeck(allLines, side);
@@ -88,7 +90,7 @@ export class DeckCompareComponent {
     }
 
     private processMoxfieldDeck(allLines: string[], side: 'left' | 'right') {
-        const sideboardIndex = allLines.findIndex(line => /^sideboard:?$/i.test(line));
+        const sideboardIndex = allLines.findIndex((line) => /^sideboard:?$/i.test(line));
         const grouped: GroupedCards = {};
 
         if (sideboardIndex !== -1) {
@@ -196,16 +198,16 @@ export class DeckCompareComponent {
             this.updateGroupedCards(side, grouped);
             return;
         }
-        Object.keys(counts).forEach(cardName => {
+        Object.keys(counts).forEach((cardName) => {
             this.http
                 .get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
                 .subscribe({
-                    next: data => {
+                    next: (data) => {
                         const typeLine = data.card_faces?.[0]?.type_line || data.type_line || 'Other';
                         const group = groupOverride || this.mapTypeToGroup(typeLine);
                         if (!grouped[group]) grouped[group] = [];
 
-                        const existing = grouped[group].find(c => c.name.toLowerCase() === data.name.toLowerCase());
+                        const existing = grouped[group].find((c) => c.name.toLowerCase() === data.name.toLowerCase());
                         if (existing) {
                             existing.count += counts[cardName];
                         } else {
@@ -219,7 +221,7 @@ export class DeckCompareComponent {
                     error: () => {
                         const group = groupOverride || 'Unknown';
                         if (!grouped[group]) grouped[group] = [];
-                        const existing = grouped[group].find(c => c.name.toLowerCase() === cardName.toLowerCase());
+                        const existing = grouped[group].find((c) => c.name.toLowerCase() === cardName.toLowerCase());
                         if (existing) {
                             existing.count += counts[cardName];
                         } else {
@@ -229,7 +231,7 @@ export class DeckCompareComponent {
                         if (--pending === 0) {
                             this.updateGroupedCards(side, grouped);
                         }
-                    }
+                    },
                 });
         });
     }
@@ -267,10 +269,10 @@ export class DeckCompareComponent {
             'Lands',
             'Other',
             'Unknown',
-            'Sideboard'
+            'Sideboard',
         ];
         const sorted: GroupedCards = {};
-        order.forEach(type => {
+        order.forEach((type) => {
             if (groups[type]) {
                 sorted[type] = groups[type].sort((a, b) => a.name.localeCompare(b.name));
             }
@@ -284,13 +286,41 @@ export class DeckCompareComponent {
 
     getGroupCount(side: 'left' | 'right', group: string): number {
         const data = side === 'left' ? this.leftGroupedCards : this.rightGroupedCards;
-        return data[group]?.reduce((acc, c) => acc + c.count, 0) || 0;
+        if (!data[group]) return 0;
+
+        // If "show differences only" is on, count only the filtered cards
+        if (this.showDifferencesOnly) {
+            return this.filterDifferentCards(data[group], side).reduce((acc, c) => acc + c.count, 0);
+        }
+
+        // Otherwise, count everything
+        return data[group].reduce((acc, c) => acc + c.count, 0);
     }
 
     cardExistsOnSide(cardName: string, side: 'left' | 'right'): boolean {
         const grouped = side === 'left' ? this.rightGroupedCards : this.leftGroupedCards;
-        return Object.values(grouped).some(cards =>
-            cards.some(c => c.name.toLowerCase() === cardName.toLowerCase())
+        return Object.values(grouped).some((cards) =>
+            cards.some((c) => c.name.toLowerCase() === cardName.toLowerCase())
         );
     }
+
+    // Toggle show differences only
+    toggleShowDifferences() {
+        this.showDifferencesOnly = !this.showDifferencesOnly;
+    }
+
+    // Filter cards based on showDifferencesOnly toggle
+    filterDifferentCards(cards: { name: string; count: number }[], side: 'left' | 'right') {
+        if (!this.showDifferencesOnly) {
+            return cards;
+        }
+        // Show only cards NOT existing on opposite side (yellow circle)
+        return cards.filter((card) => !this.cardExistsOnSide(card.name, side));
+    }
+
+    getFilteredGroupCount(cards: { name: string; count: number }[], side: 'left' | 'right'): number {
+        return this.filterDifferentCards(cards, side).reduce((acc, c) => acc + c.count, 0);
+    }
+
 }
+

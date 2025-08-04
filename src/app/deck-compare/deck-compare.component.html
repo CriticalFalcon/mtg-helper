@@ -1,6 +1,6 @@
 <div class="container-fluid mt-4">
-    <div class="row h-100">
-        <!-- Left Column -->
+    <div class="row">
+        <!-- Left Input Column -->
         <div class="col-md-6 d-flex flex-column p-3">
             <div class="mb-4">
                 <label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
@@ -10,26 +10,9 @@
                     Process Left Deck
                 </button>
             </div>
-
-            <div *ngFor="let group of getGroupKeys('left')" [class.commander]="group === 'Commander'"
-                [class.sideboard]="group === 'Sideboard'" class="group-container mt-3">
-                <div class="group-header">
-                    {{ group }}
-                    <span class="group-count">{{ getGroupCount('left', group) }}</span>
-                </div>
-                <ul class="card-list">
-                    <li *ngFor="let card of leftGroupedCards[group]" class="card-item"
-                        (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-                        <span>{{ card.count }}x {{ card.name }}</span>
-                        <span *ngIf="group !== 'Sideboard'" class="status-circle"
-                            [ngClass]="cardExistsOnSide(card.name, 'left') ? 'circle-green' : 'circle-yellow'">
-                        </span>
-                    </li>
-                </ul>
-            </div>
         </div>
 
-        <!-- Right Column -->
+        <!-- Right Input Column -->
         <div class="col-md-6 d-flex flex-column p-3">
             <div class="mb-4">
                 <label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
@@ -39,27 +22,71 @@
                     Process Right Deck
                 </button>
             </div>
+        </div>
+    </div>
 
-            <div *ngFor="let group of getGroupKeys('right')" [class.commander]="group === 'Commander'"
-                [class.sideboard]="group === 'Sideboard'" class="group-container mt-3">
-                <div class="group-header">
-                    {{ group }}
-                    <span class="group-count">{{ getGroupCount('right', group) }}</span>
+    <!-- Toggle Button Centered Below Inputs -->
+    <div class="d-flex justify-content-center my-3">
+        <button type="button" class="btn btn-outline-primary btn-pill" [class.active]="showDifferencesOnly"
+            (click)="toggleShowDifferences()" [attr.aria-pressed]="showDifferencesOnly"
+            title="Show only cards that differ between decks">
+            Show Differences Only
+        </button>
+    </div>
+
+    <!-- Deck Lists Columns -->
+    <div class="row h-100">
+        <!-- Left Deck Groups -->
+        <div class="col-md-6 d-flex flex-column p-3">
+            <h5 class="deck-header text-center d-md-none mb-2">Deck 1</h5>
+            <ng-container *ngFor="let group of getGroupKeys('left')">
+                <div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
+                    class="group-container mt-3"
+                    *ngIf="filterDifferentCards(leftGroupedCards[group], 'left').length > 0 || !showDifferencesOnly">
+                    <div class="group-header">
+                        {{ group }}
+                        <span class="group-count">{{ getFilteredGroupCount(leftGroupedCards[group], 'left') }}</span>
+                    </div>
+                    <ul class="card-list">
+                        <li *ngFor="let card of filterDifferentCards(leftGroupedCards[group], 'left')" class="card-item"
+                            (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
+                            <span>{{ card.count }}x {{ card.name }}</span>
+                            <span *ngIf="group !== 'Sideboard'" class="status-circle"
+                                [ngClass]="cardExistsOnSide(card.name, 'left') ? 'circle-green' : 'circle-yellow'">
+                            </span>
+                        </li>
+                    </ul>
                 </div>
-                <ul class="card-list">
-                    <li *ngFor="let card of rightGroupedCards[group]" class="card-item"
-                        (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-                        <span>{{ card.count }}x {{ card.name }}</span>
-                        <span *ngIf="group !== 'Sideboard'" class="status-circle"
-                            [ngClass]="cardExistsOnSide(card.name, 'right') ? 'circle-green' : 'circle-yellow'">
-                        </span>
-                    </li>
-                </ul>
-            </div>
+            </ng-container>
+        </div>
+    <!-- Mobile horizontal separator -->
+    <div class="deck-separator d-md-none"></div>
+        <!-- Right Deck Groups -->
+        <div class="col-md-6 d-flex flex-column p-3">
+            <h5 class="deck-header text-center d-md-none mb-2">Deck 2</h5>
+            <ng-container *ngFor="let group of getGroupKeys('right')">
+                <div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
+                    class="group-container mt-3"
+                    *ngIf="filterDifferentCards(rightGroupedCards[group], 'right').length > 0 || !showDifferencesOnly">
+                    <div class="group-header">
+                        {{ group }}
+                        <span class="group-count">{{ getFilteredGroupCount(rightGroupedCards[group], 'right') }}</span>
+                    </div>
+                    <ul class="card-list">
+                        <li *ngFor="let card of filterDifferentCards(rightGroupedCards[group], 'right')"
+                            class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
+                            <span>{{ card.count }}x {{ card.name }}</span>
+                            <span *ngIf="group !== 'Sideboard'" class="status-circle"
+                                [ngClass]="cardExistsOnSide(card.name, 'right') ? 'circle-green' : 'circle-yellow'">
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </ng-container>
         </div>
     </div>
 
     <!-- Floating card image -->
     <img *ngIf="hoveredCardImage" [src]="hoveredCardImage" class="card-preview" [style.left.px]="hoverCardPosition.x"
-        [style.top.px]="hoverCardPosition.y">
+        [style.top.px]="hoverCardPosition.y" />
 </div>

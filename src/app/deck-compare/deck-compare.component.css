@@ -30,6 +30,7 @@ body,
 /* Column styling */
 .col-md-6 {
     border-right: 1px solid #ddd;
+    position: relative;
 }
 
 .col-md-6:last-child {
@@ -102,11 +103,11 @@ body,
 }
 
 .circle-green {
-    background-color: #198754
+    background-color: #198754;
 }
 
 .circle-yellow {
-    background-color: #ffc107
+    background-color: #ffc107;
 }
 
 /* Commander and Sideboard styles */
@@ -141,4 +142,40 @@ body,
     pointer-events: none;
     z-index: 9999;
     border-radius: 12px;
+}
+
+/* Floating centered toggle */
+.toggle-wrapper {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-pill {
+    border-radius: 50px;
+    padding: 0.4rem 1.2rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-pill.active {
+    background-color: #0d6efd;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Remove divider on mobile */
+@media (max-width: 768px) {
+    .col-md-6 {
+        border-right: none;
+    }
+
+    .deck-header {
+        font-weight: 600;
+        color: #1f2937;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 0.5rem;
+        background-color: #f8fafc;
+    }
 }
