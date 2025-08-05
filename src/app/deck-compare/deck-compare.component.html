@@ -6,8 +6,8 @@
                 <label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
                 <textarea id="leftRawDecklist" [(ngModel)]="leftDeckText" class="form-control expandable-textarea"
                     placeholder="Paste here" rows="6"></textarea>
-                <button class="btn btn-primary mt-3 btn-sm" (click)="processDecklist(leftDeckText, 'left')">
-                    Process Left Deck
+                <button class="btn btn-primary mt-3 btn-sm btn-pill" (click)="processDecklist(leftDeckText, 'left')">
+                    Import Deck 1
                 </button>
             </div>
         </div>
@@ -18,8 +18,8 @@
                 <label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
                 <textarea id="rightRawDecklist" [(ngModel)]="rightDeckText" class="form-control expandable-textarea"
                     placeholder="Paste here" rows="6"></textarea>
-                <button class="btn btn-primary mt-3 btn-sm" (click)="processDecklist(rightDeckText, 'right')">
-                    Process Right Deck
+                <button class="btn btn-primary mt-3 btn-sm btn-pill" (click)="processDecklist(rightDeckText, 'right')">
+                    Import Deck 2
                 </button>
             </div>
         </div>
@@ -30,7 +30,7 @@
         <button type="button" class="btn btn-outline-primary btn-pill" [class.active]="showDifferencesOnly"
             (click)="toggleShowDifferences()" [attr.aria-pressed]="showDifferencesOnly"
             title="Show only cards that differ between decks">
-            Show Differences Only
+            Show Differences
         </button>
     </div>
 

@@ -1,7 +1,7 @@
 /* Dark mode styling */
 html[data-bs-theme="dark"] .group-container {
-    background-color: #1e293b;
-    border: 1px solid #334155;
+    background-color: #1b1b1b;
+    border: 1px solid #2a2a2a;
     box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
 }
 
@@ -11,14 +11,14 @@ html[data-bs-theme="dark"] .group-container.commander {
 }
 
 html[data-bs-theme="dark"] .group-container.sideboard {
-    background-color: #2d2d2d;
-    border-color: #3f3f3f;
+    background-color: #222222;
+    border-color: #333333;
     opacity: 0.9;
 }
 
 html[data-bs-theme="dark"] .group-header {
-    color: #e2e8f0;
-    border-bottom-color: #3b82f6aa;
+    color: #e5e5e5;
+    border-bottom-color: #3a3a3a;
 }
 
 html[data-bs-theme="dark"] .group-container.commander .group-header {
@@ -27,12 +27,12 @@ html[data-bs-theme="dark"] .group-container.commander .group-header {
 }
 
 html[data-bs-theme="dark"] .card-item {
-    color: #f1f5f9;
-    border-bottom: 1px solid #475569;
+    color: #f1f1f1;
+    border-bottom: 1px solid #3a3a3a;
 }
 
 html[data-bs-theme="dark"] .group-count {
-    background-color: #3b82f6;
+    background-color: #4a4a4a;
     color: #f1f5f9;
 }
 
