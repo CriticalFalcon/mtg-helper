@@ -1,115 +1,115 @@
 .card-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+	max-width: 1200px;
+	margin: 0 auto;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
 }
 
 /* Card image */
 .card-image-wrapper {
-    flex: 1 1 300px;
-    max-width: 336px;
-    text-align: center;
+	flex: 1 1 300px;
+	max-width: 336px;
+	text-align: center;
 }
 
 .main-card-img {
-    max-width: 100%;
-    border-radius: 16px;
+	max-width: 100%;
+	border-radius: 16px;
 }
 
 /* Card details */
 .card-details {
-    flex: 2 1 400px;
-    min-width: 280px;
-    max-width: 550px;
+	flex: 2 1 400px;
+	min-width: 280px;
+	max-width: 550px;
 }
 
 /* Title and mana cost */
 .card-text-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+	font-size: 1.8rem;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
 }
 
 .card-text-mana-cost img {
-    width: 15px;
-    height: 15px;
-    vertical-align: middle;
+	width: 15px;
+	height: 15px;
+	vertical-align: middle;
 }
 
 /* Type line */
 .card-text-type-line {
-    font-weight: 500;
-    font-size: 1.1rem;
-    margin: 0.5rem 0;
-    color: #555;
+	font-weight: 500;
+	font-size: 1.1rem;
+	margin: 0.5rem 0;
+	color: #555;
 }
 
 /* Oracle text box */
 .card-text-box {
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    box-shadow: 1px 3px rgb(0 0 0 / 0.05);
+	background-color: #f3f4f6;
+	border: 1px solid #d1d5db;
+	padding: 1rem;
+	border-radius: 8px;
+	margin-bottom: 1rem;
+	box-shadow: 1px 3px rgb(0 0 0 / 0.05);
 }
 
 .card-text-oracle p {
-    margin: 0 0 0.8rem 0;
-    line-height: 1.6;
+	margin: 0 0 0.8rem 0;
+	line-height: 1.6;
 }
 
 .card-text-oracle p:last-child {
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 /* Prints section */
 .card-prints {
-    flex: 1 1 240px;
-    min-width: 200px;
-    max-width: 300px;
+	flex: 1 1 240px;
+	min-width: 200px;
+	max-width: 300px;
 }
 
 .card-text {
-    font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 ul.list-unstyled li a {
-    color: #0d6efd;
-    text-decoration: none;
+	color: #0d6efd;
+	text-decoration: none;
 }
 
 ul.list-unstyled li a:hover {
-    text-decoration: underline;
+	text-decoration: underline;
 }
 
 /* Mana symbols */
 .mana-symbol {
-    width: 18px;
-    height: 18px;
-    vertical-align: middle;
-    margin: 0 2px;
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+	margin: 0 2px;
 }
 
 /* Smooth responsive stacking */
 @media (max-width: 992px) {
-    .card-container {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
+	.card-container {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
 
-    .card-details,
-    .card-prints {
-        max-width: 100%;
-    }
+	.card-details,
+	.card-prints {
+		max-width: 100%;
+	}
 
-    .card-text-title {
-        justify-content: center;
-    }
+	.card-text-title {
+		justify-content: center;
+	}
 }

@@ -1,125 +1,124 @@
+/* Bootstrap icons (if not already included) */
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css');
+
 /* Modern circular dark mode toggle */
 .dark-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
-    height: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
-    border-radius: 50%;
-    border: 1.5px solid #94a3b8;
-    background: #ffffff;
-    color: #1e293b;
-    font-size: 1.25rem;
-    transition:
-        background 0.25s ease,
-        color 0.25s ease,
-        box-shadow 0.25s ease,
-        transform 0.15s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    animation: pulseLight 4s infinite ease-in-out;
-    vertical-align: middle;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
+	height: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
+	border-radius: 50%;
+	border: 1.5px solid #94a3b8;
+	background: #ffffff;
+	color: #1e293b;
+	font-size: 1.25rem;
+	transition:
+		background 0.25s ease,
+		color 0.25s ease,
+		box-shadow 0.25s ease,
+		transform 0.15s ease;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	animation: pulseLight 4s infinite ease-in-out;
+	vertical-align: middle;
 }
 
 /* Hover effect */
 .dark-toggle-btn:hover {
-    background: #f0f4f8;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-    transform: scale(1.05);
-    color: #64748b;
-    transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease, color 0.3s ease;
+	background: #f0f4f8;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+	transform: scale(1.05);
+	color: #64748b;
+	transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease, color 0.3s ease;
 }
 
 /* Active (dark mode on) */
 .dark-toggle-btn.active {
-    background: #1f2937;
-    color: #facc15;
-    border-color: #facc15;
-    box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
-    animation: glowPulse 4s infinite ease-in-out;
-    animation-name: glowPulse;
+	background: #1f2937;
+	color: #facc15;
+	border-color: #facc15;
+	box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+	animation: glowPulse 4s infinite ease-in-out;
+	animation-name: glowPulse;
 }
 
 /* Icon animation */
 .dark-toggle-btn i {
-    transition: transform 0.4s ease;
+	transition: transform 0.4s ease;
 }
 
 .dark-toggle-btn.active i {
-    transform: rotate(360deg);
+	transform: rotate(360deg);
 }
 
 /* Softer, slower breathing glow for dark mode */
 @keyframes glowPulse {
 
-    0%,
-    100% {
-        box-shadow: 0 0 6px rgba(250, 204, 21, 0.3);
-    }
+	0%,
+	100% {
+		box-shadow: 0 0 6px rgba(250, 204, 21, 0.3);
+	}
 
-    50% {
-        box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
-    }
+	50% {
+		box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+	}
 }
 
 /* Light mode subtle pulse keyframes */
 @keyframes pulseLight {
 
-    0%,
-    100% {
-        box-shadow: 0 0 5px rgba(100, 116, 139, 0.15);
-    }
+	0%,
+	100% {
+		box-shadow: 0 0 5px rgba(100, 116, 139, 0.15);
+	}
 
-    50% {
-        box-shadow: 0 0 12px rgba(100, 116, 139, 0.3);
-    }
+	50% {
+		box-shadow: 0 0 12px rgba(100, 116, 139, 0.3);
+	}
 }
 
-
-/* Bootstrap icons (if not already included) */
-@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css');
-
 .navbar .list-group-item {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .navbar .list-group-item.active {
-    background-color: #0d6efd;
-    color: white;
+	background-color: #0d6efd;
+	color: white;
 }
 
 /* navbar.component.css */
 .list-group {
-    max-height: 300px;
-    overflow-y: auto;
+	max-height: 300px;
+	overflow-y: auto;
 }
 
 form .list-group {
-    width: 100% !important;
+	width: 100% !important;
 }
 
 /* Wrapper to control input size */
 .search-input-wrapper {
-    flex: 1;
-    min-width: 300px;
-    max-width: 400px;
+	flex: 1;
+	min-width: 300px;
+	max-width: 400px;
 }
 
 /* Input fills wrapper */
 .search-input {
-    width: 100%;
+	width: 100%;
 }
 
 /* Dropdown matches input width */
 .suggestions-dropdown {
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    max-height: 300px;
-    overflow-y: auto;
+	top: 100%;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	max-height: 300px;
+	overflow-y: auto;
 }
 
 /* Ensure the small screen toggle + hamburger sit flush left with proper spacing */
 .d-lg-none.d-flex {
-    gap: 0.25rem;
+	gap: 0.25rem;
 }

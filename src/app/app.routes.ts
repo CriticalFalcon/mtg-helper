@@ -4,8 +4,8 @@ import { DeckCompareComponent } from './deck-compare/deck-compare.component';
 import { HomeComponent } from './home/home.component';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent },
-    { path: 'card/:name', component: CardSearchComponent },
-    { path: 'compare', component: DeckCompareComponent },
-    { path: '**', redirectTo: '' } // fallback
+	{ path: '', component: HomeComponent },
+	{ path: 'card/:name', component: CardSearchComponent },
+	{ path: 'compare', component: DeckCompareComponent },
+	{ path: '**', redirectTo: '' } // fallback
 ];

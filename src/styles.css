@@ -1,120 +1,120 @@
 /* Dark mode styling */
 html[data-bs-theme="dark"] .group-container {
-    background-color: #1b1b1b;
-    border: 1px solid #2a2a2a;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+	background-color: #1b1b1b;
+	border: 1px solid #2a2a2a;
+	box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
 }
 
 html[data-bs-theme="dark"] .group-container.commander {
-    background-color: #3b2f1d;
-    border-color: #b45309;
+	background-color: #3b2f1d;
+	border-color: #b45309;
 }
 
 html[data-bs-theme="dark"] .group-container.sideboard {
-    background-color: #222222;
-    border-color: #333333;
-    opacity: 0.9;
+	background-color: #222222;
+	border-color: #333333;
+	opacity: 0.9;
 }
 
 html[data-bs-theme="dark"] .group-header {
-    color: #e5e5e5;
-    border-bottom-color: #3a3a3a;
+	color: #e5e5e5;
+	border-bottom-color: #3a3a3a;
 }
 
 html[data-bs-theme="dark"] .group-container.commander .group-header {
-    color: #fbbf24;
-    border-bottom-color: #b45309;
+	color: #fbbf24;
+	border-bottom-color: #b45309;
 }
 
 html[data-bs-theme="dark"] .card-item {
-    color: #f1f1f1;
-    border-bottom: 1px solid #3a3a3a;
+	color: #f1f1f1;
+	border-bottom: 1px solid #3a3a3a;
 }
 
 html[data-bs-theme="dark"] .group-count {
-    background-color: #4a4a4a;
-    color: #f1f5f9;
+	background-color: #4a4a4a;
+	color: #f1f5f9;
 }
 
 /* Dark mode: add a subtle glow */
 html[data-bs-theme="dark"] .card-preview {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+	box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+	border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Light mode: keep it simple */
 html[data-bs-theme="light"] .card-preview {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(0, 0, 0, 0.2);
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+	border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .mana-symbol {
-    width: 15px;
-    height: 15px;
-    vertical-align: middle;
-    margin: 0 2px;
-    box-shadow: -1px 1px 0 rgba(0, 0, 0, 0.85);
-    border-radius: 500px;
+	width: 15px;
+	height: 15px;
+	vertical-align: middle;
+	margin: 0 2px;
+	box-shadow: -1px 1px 0 rgba(0, 0, 0, 0.85);
+	border-radius: 500px;
 }
 
 
 /* Deck headers */
 .deck-header {
-    font-weight: 600;
-    font-size: 1rem;
-    text-align: center;
-    margin: 0.5rem 0 1rem 0;
-    padding: 0.4rem 0.6rem;
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    color: #1f2937;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+	font-weight: 600;
+	font-size: 1rem;
+	text-align: center;
+	margin: 0.5rem 0 1rem 0;
+	padding: 0.4rem 0.6rem;
+	background-color: #f3f4f6;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	color: #1f2937;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Dark mode deck headers */
 html[data-bs-theme="dark"] .deck-header {
-    background-color: #1e293b;
-    border: 1px solid #334155;
-    color: #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+	background-color: #1e293b;
+	border: 1px solid #334155;
+	color: #e2e8f0;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {
 
-    /* Add a horizontal separator between stacked decks */
-    .deck-separator {
-        width: 100%;
-        height: 1px;
-        background-color: #d1d5db;
-        margin: 1rem 0;
-    }
+	/* Add a horizontal separator between stacked decks */
+	.deck-separator {
+		width: 100%;
+		height: 1px;
+		background-color: #d1d5db;
+		margin: 1rem 0;
+	}
 
-    /* Dark mode separator */
-    html[data-bs-theme="dark"] .deck-separator {
-        background-color: #334155;
-    }
+	/* Dark mode separator */
+	html[data-bs-theme="dark"] .deck-separator {
+		background-color: #334155;
+	}
 }
 
 html[data-bs-theme="dark"] .card-text-box {
-    background-color: #1b1b1b;
-    border: 1px solid #2a2a2a;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
+	background-color: #1b1b1b;
+	border: 1px solid #2a2a2a;
+	box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
 }
 
 html[data-bs-theme="dark"] .card-text-type-line {
-    color: #e5e5e5;
+	color: #e5e5e5;
 }
 
 html[data-bs-theme="dark"] .card-text-oracle p {
-    color: #f1f5f9;
+	color: #f1f5f9;
 }
 
 html[data-bs-theme="dark"] .card-prints h4,
 html[data-bs-theme="dark"] .card-prints a {
-    color: #e5e5e5;
+	color: #e5e5e5;
 }
 
 html[data-bs-theme="dark"] .card-text-title {
-    color: #e5e5e5;
+	color: #e5e5e5;
 }
