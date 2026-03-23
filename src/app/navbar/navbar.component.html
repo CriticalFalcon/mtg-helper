@@ -1,57 +1,69 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
-	<div class="container-fluid d-flex justify-content-between align-items-center">
-		<a class="navbar-brand">MTG Helper</a>
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+    <a class="navbar-brand">MTG Helper</a>
 
-		<!-- Small screen toggle + hamburger wrapper -->
-		<div class="d-lg-none d-flex align-items-center">
-			<!-- Dark mode toggle visible only on small screens -->
-			<button type="button" class="btn dark-toggle-btn me-2" (click)="toggleDarkMode()"
-				[class.active]="isDarkMode" [attr.aria-pressed]="isDarkMode" title="Toggle dark mode">
-				<i *ngIf="!isDarkMode" class="bi bi-moon-fill"></i>
-				<i *ngIf="isDarkMode" class="bi bi-sun-fill"></i>
-			</button>
+    <!-- Small screen toggle + hamburger wrapper -->
+    <div class="d-lg-none d-flex align-items-center">
+      <!-- Dark mode toggle visible only on small screens -->
+      <button type="button" class="btn dark-toggle-btn me-2" (click)="toggleDarkMode()"
+        [class.active]="isDarkMode" [attr.aria-pressed]="isDarkMode" title="Toggle dark mode">
+        @if (!isDarkMode) {
+          <i class="bi bi-moon-fill"></i>
+        }
+        @if (isDarkMode) {
+          <i class="bi bi-sun-fill"></i>
+        }
+      </button>
 
-			<!-- Hamburger toggle -->
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-				data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-				aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-		</div>
+      <!-- Hamburger toggle -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
 
-		<!-- Collapse content -->
-		<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-				<li class="nav-item">
-					<a class="nav-link" routerLink="/">Home</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" routerLink="/compare" routerLinkActive="active">Compare</a>
-				</li>
-			</ul>
+    <!-- Collapse content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/compare" routerLinkActive="active">Compare</a>
+        </li>
+      </ul>
 
-			<form class="d-flex flex-nowrap align-items-center position-relative" role="search" (ngSubmit)="onSearch()">
-				<div class="position-relative search-input-wrapper me-2">
-					<input class="form-control search-input" type="search" placeholder="Search" [(ngModel)]="searchTerm"
-						name="searchTerm" (input)="onInputChange()" (keydown)="handleKeyDown($event)"
-						(focus)="onInputFocus()" (blur)="onInputBlur()" />
-					<ul *ngIf="showSuggestions" class="list-group position-absolute shadow suggestions-dropdown">
-						<li *ngFor="let suggestion of suggestions; let i = index"
-							class="list-group-item list-group-item-action" [class.active]="i === activeIndex"
-							(click)="selectSuggestion(suggestion)">
-							<span [innerHTML]="suggestion | highlight:userInput"></span>
-						</li>
-					</ul>
-				</div>
-				<button type="submit" class="btn btn-primary me-2">Search</button>
+      <form class="d-flex flex-nowrap align-items-center position-relative" role="search" (ngSubmit)="onSearch()">
+        <div class="position-relative search-input-wrapper me-2">
+          <input class="form-control search-input" type="search" placeholder="Search" [(ngModel)]="searchTerm"
+            name="searchTerm" (input)="onInputChange()" (keydown)="handleKeyDown($event)"
+            (focus)="onInputFocus()" (blur)="onInputBlur()" />
+            @if (showSuggestions) {
+              <ul class="list-group position-absolute shadow suggestions-dropdown">
+                @for (suggestion of suggestions; track suggestion; let i = $index) {
+                  <li
+                    class="list-group-item list-group-item-action" [class.active]="i === activeIndex"
+                    (click)="selectSuggestion(suggestion)">
+                    <span [innerHTML]="suggestion | highlight:userInput"></span>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+          <button type="submit" class="btn btn-primary me-2">Search</button>
 
-				<!-- Large screen toggle, visible only on lg+ -->
-				<button type="button" class="btn dark-toggle-btn d-none d-lg-flex" (click)="toggleDarkMode()"
-					[class.active]="isDarkMode" [attr.aria-pressed]="isDarkMode" title="Toggle dark mode">
-					<i *ngIf="!isDarkMode" class="bi bi-moon-fill"></i>
-					<i *ngIf="isDarkMode" class="bi bi-sun-fill"></i>
-				</button>
-			</form>
-		</div>
-	</div>
-</nav>
+          <!-- Large screen toggle, visible only on lg+ -->
+          <button type="button" class="btn dark-toggle-btn d-none d-lg-flex" (click)="toggleDarkMode()"
+            [class.active]="isDarkMode" [attr.aria-pressed]="isDarkMode" title="Toggle dark mode">
+            @if (!isDarkMode) {
+              <i class="bi bi-moon-fill"></i>
+            }
+            @if (isDarkMode) {
+              <i class="bi bi-sun-fill"></i>
+            }
+          </button>
+        </form>
+      </div>
+    </div>
+  </nav>

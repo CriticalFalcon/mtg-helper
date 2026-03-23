@@ -1,14 +1,14 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { HighlightPipe } from '../shared/pipes/highlight.pipe';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
 	selector: 'app-navbar',
 	standalone: true,
-	imports: [CommonModule, FormsModule, HighlightPipe, RouterModule],
+	imports: [FormsModule, HighlightPipe, RouterModule],
 	templateUrl: './navbar.component.html',
 	styleUrls: ['./navbar.component.css']
 })

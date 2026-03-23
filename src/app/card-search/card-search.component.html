@@ -1,58 +1,68 @@
 <div class="container mt-4">
-	<div class="d-flex flex-wrap justify-content-center gap-4 card-container" *ngIf="cardImage || cardName">
-		<!-- Card Image -->
-		<div class="card-image-wrapper">
-			<img [src]="hoveredPrintImage || cardImage" class="img-fluid shadow main-card-img" alt="Card Image" />
-		</div>
+  @if (cardImage || cardName) {
+    <div class="d-flex flex-wrap justify-content-center gap-4 card-container">
+      <!-- Card Image -->
+      <div class="card-image-wrapper">
+        <img [src]="hoveredPrintImage || cardImage" class="img-fluid shadow main-card-img" alt="Card Image" />
+      </div>
+      <!-- Card Details -->
+      <div class="card-details">
+        <h1 class="card-text-title">
+          <span class="card-text-card-name">{{ cardName }}</span>
+          <span class="card-text-mana-cost">
+            @for (token of typeLine | manaSymbol; track token) {
+              @if (token.type === 'symbol') {
+                <img
+                  [src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
+                  alt="{{token.value}}" class="mana-symbol">
+              }
+            }
+          </span>
+        </h1>
+        <p class="card-text-type-line">{{ typeLine }}</p>
+        <!-- Oracle Text -->
+        <div class="card-text-box">
+          <div class="card-text-oracle">
+            @for (paragraph of (oracleText?.split('\n') || []); track paragraph) {
+              <p>
+                @for (token of paragraph | manaSymbol; track token) {
+                  @switch (token.type) {
+                    @case ('symbol') {
+                      <img
+                        [src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
+                        alt="{{token.value}}" class="mana-symbol">
+                    }
+                    @case ('text') {
+                      <span>{{ token.value }}</span>
+                    }
+                  }
+                }
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+      <!-- Available Prints -->
+      @if (prints.length > 0) {
+        <div class="card-prints">
+          <h4>Available Prints</h4>
+          <ul class="list-unstyled">
+            @for (print of prints; track print) {
+              <li>
+                <a [href]="print.imageUrl" target="_blank" (mouseenter)="hoveredPrintImage = print.imageUrl"
+                (mouseleave)="hoveredPrintImage = null">{{ print.setName }}</a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  }
 
-		<!-- Card Details -->
-		<div class="card-details">
-			<h1 class="card-text-title">
-				<span class="card-text-card-name">{{ cardName }}</span>
-				<span class="card-text-mana-cost">
-					<ng-container *ngFor="let token of typeLine | manaSymbol">
-						<img *ngIf="token.type === 'symbol'"
-							[src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
-							alt="{{token.value}}" class="mana-symbol">
-					</ng-container>
-				</span>
-			</h1>
-
-			<p class="card-text-type-line">{{ typeLine }}</p>
-
-			<!-- Oracle Text -->
-			<div class="card-text-box">
-				<div class="card-text-oracle">
-					<ng-container *ngFor="let paragraph of (oracleText?.split('\n') || [])">
-						<p>
-							<ng-container *ngFor="let token of paragraph | manaSymbol">
-								<ng-container [ngSwitch]="token.type">
-									<img *ngSwitchCase="'symbol'"
-										[src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
-										alt="{{token.value}}" class="mana-symbol">
-									<span *ngSwitchCase="'text'">{{ token.value }}</span>
-								</ng-container>
-							</ng-container>
-						</p>
-					</ng-container>
-				</div>
-			</div>
-		</div>
-
-		<!-- Available Prints -->
-		<div class="card-prints" *ngIf="prints.length > 0">
-			<h4>Available Prints</h4>
-			<ul class="list-unstyled">
-				<li *ngFor="let print of prints">
-					<a [href]="print.imageUrl" target="_blank" (mouseenter)="hoveredPrintImage = print.imageUrl"
-						(mouseleave)="hoveredPrintImage = null">{{ print.setName }}</a>
-				</li>
-			</ul>
-		</div>
-	</div>
-
-	<!-- No results / error -->
-	<div class="text-center text-danger mt-3" *ngIf="errorMessage">
-		{{ errorMessage }}
-	</div>
+  <!-- No results / error -->
+  @if (errorMessage) {
+    <div class="text-center text-danger mt-3">
+      {{ errorMessage }}
+    </div>
+  }
 </div>
