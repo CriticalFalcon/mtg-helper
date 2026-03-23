@@ -1,68 +1,74 @@
-<div class="container mt-4">
-  @if (cardImage || cardName) {
-    <div class="d-flex flex-wrap justify-content-center gap-4 card-container">
-      <!-- Card Image -->
-      <div class="card-image-wrapper">
-        <img [src]="hoveredPrintImage || cardImage" class="img-fluid shadow main-card-img" alt="Card Image" />
-      </div>
-      <!-- Card Details -->
-      <div class="card-details">
-        <h1 class="card-text-title">
-          <span class="card-text-card-name">{{ cardName }}</span>
-          <span class="card-text-mana-cost">
-            @for (token of typeLine | manaSymbol; track token) {
-              @if (token.type === 'symbol') {
-                <img
-                  [src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
-                  alt="{{token.value}}" class="mana-symbol">
-              }
-            }
-          </span>
-        </h1>
-        <p class="card-text-type-line">{{ typeLine }}</p>
-        <!-- Oracle Text -->
-        <div class="card-text-box">
-          <div class="card-text-oracle">
-            @for (paragraph of (oracleText?.split('\n') || []); track paragraph) {
-              <p>
-                @for (token of paragraph | manaSymbol; track token) {
-                  @switch (token.type) {
-                    @case ('symbol') {
-                      <img
-                        [src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
-                        alt="{{token.value}}" class="mana-symbol">
-                    }
-                    @case ('text') {
-                      <span>{{ token.value }}</span>
-                    }
-                  }
-                }
-              </p>
-            }
-          </div>
-        </div>
-      </div>
-      <!-- Available Prints -->
-      @if (prints.length > 0) {
-        <div class="card-prints">
-          <h4>Available Prints</h4>
-          <ul class="list-unstyled">
-            @for (print of prints; track print) {
-              <li>
-                <a [href]="print.imageUrl" target="_blank" (mouseenter)="hoveredPrintImage = print.imageUrl"
-                (mouseleave)="hoveredPrintImage = null">{{ print.setName }}</a>
-              </li>
-            }
-          </ul>
-        </div>
-      }
-    </div>
-  }
+<div class="container mt-5">
+	@if (!cardImage && !cardName && !errorMessage) {
+	<div class="text-center">
+		<h2 class="mb-4">Find any Magic card</h2>
+		<p class="text-muted">Use the search box at the top to explore cards, check details, and see all available
+			prints.</p>
+	</div>
+	}
 
-  <!-- No results / error -->
-  @if (errorMessage) {
-    <div class="text-center text-danger mt-3">
-      {{ errorMessage }}
-    </div>
-  }
+	@if (cardImage || cardName) {
+	<div class="d-flex flex-wrap justify-content-center gap-4 card-container">
+		<!-- Card Image -->
+		<div class="card-image-wrapper">
+			<img [src]="hoveredPrintImage || cardImage" class="img-fluid shadow main-card-img" alt="Card Image" />
+		</div>
+		<!-- Card Details -->
+		<div class="card-details">
+			<h1 class="card-text-title">
+				<span class="card-text-card-name">{{ cardName }}</span>
+				<span class="card-text-mana-cost">
+					@for (token of typeLine | manaSymbol; track token) {
+					@if (token.type === 'symbol') {
+					<img [src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'" alt="{{token.value}}"
+						class="mana-symbol">
+					}
+					}
+				</span>
+			</h1>
+			<p class="card-text-type-line">{{ typeLine }}</p>
+			<!-- Oracle Text -->
+			<div class="card-text-box">
+				<div class="card-text-oracle">
+					@for (paragraph of (oracleText?.split('\n') || []); track paragraph) {
+					<p>
+						@for (token of paragraph | manaSymbol; track token) {
+						@switch (token.type) {
+						@case ('symbol') {
+						<img [src]="'https://svgs.scryfall.io/card-symbols/' + token.value + '.svg'"
+							alt="{{token.value}}" class="mana-symbol">
+						}
+						@case ('text') {
+						<span>{{ token.value }}</span>
+						}
+						}
+						}
+					</p>
+					}
+				</div>
+			</div>
+		</div>
+		<!-- Available Prints -->
+		@if (prints.length > 0) {
+		<div class="card-prints">
+			<h4>Available Prints</h4>
+			<ul class="list-unstyled">
+				@for (print of prints; track print) {
+				<li>
+					<a [href]="print.imageUrl" target="_blank" (mouseenter)="hoveredPrintImage = print.imageUrl"
+						(mouseleave)="hoveredPrintImage = null">{{ print.setName }}</a>
+				</li>
+				}
+			</ul>
+		</div>
+		}
+	</div>
+	}
+
+	<!-- No results / error -->
+	@if (errorMessage) {
+	<div class="text-center text-danger mt-3">
+		{{ errorMessage }}
+	</div>
+	}
 </div>

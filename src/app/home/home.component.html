@@ -3,40 +3,42 @@
 	<p class="lead">Find cards, build decks, and compare lines of play all in one place.</p>
 	<p class="text-muted">Quick, interactive deck analysis tailored to Magic: The Gathering players.</p>
 </div>
-<div class="container mt-4">
-	<h2>Core features</h2>
-	<div class="row">
-		<div class="col-md-6">
-			<h3>Card Search</h3>
-			<p>Search by name, set, type, mana cost, color, rarity, and text. Access print details and quick card
-				insights.</p>
+<div class="container mt-5">
+	<section class="mb-5">
+		<h2 class="mb-4">Features</h2>
+		<div class="row g-4">
+			<div class="col-md-6">
+				<div class="p-3 border-start border-primary border-3">
+					<h4>Card Search</h4>
+					<p class="text-muted mb-0">Search by name, set, type, cost, and more. Get instant card details and
+						insights.</p>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="p-3 border-start border-primary border-3">
+					<h4>Deck Compare</h4>
+					<p class="text-muted mb-0">Compare decks side-by-side. Analyze overlap, curves, colors, and balance.
+					</p>
+				</div>
+			</div>
 		</div>
-		<div class="col-md-6">
-			<h3>Deck Compare</h3>
-			<p>Compare two decks instantly. See card overlap, mana curves, color spread, and matchup balance.</p>
+	</section>
+
+	<section class="mb-5">
+		<h2 class="mb-4">Getting started</h2>
+		<ol class="text-muted">
+			<li>Search for cards using your favorite filters</li>
+			<li>Build or import two decks to compare</li>
+			<li>Review stats and make tuning decisions</li>
+			<li>Refine iteratively for your format</li>
+		</ol>
+	</section>
+
+	<section>
+		<h2 class="mb-4">Start exploring</h2>
+		<div class="d-flex gap-3">
+			<button routerLink="/card" class="btn btn-primary">Card Search</button>
+			<button routerLink="/compare" class="btn btn-outline-primary">Deck Compare</button>
 		</div>
-	</div>
-
-	<h2>How to start</h2>
-	<ol>
-		<li>Go to <strong>Card Search</strong> and find the cards you want.</li>
-		<li>Use <strong>Deck Compare</strong> to load two decks or create new ones.</li>
-		<li>Analyze the results and tune your deck for consistency and strength.</li>
-		<li>Use side-by-side metrics to decide your final mainboard cards.</li>
-	</ol>
-
-	<h2>Player tips</h2>
-	<ul>
-		<li>Begin with a clear strategy: Aggro, Control, Combo, or Commander.</li>
-		<li>Filter to your preferred format and keep your deck lean.</li>
-		<li>Use compare stats to spot mana gaps and redundancies.</li>
-		<li>Test iteratively and update based on match results.</li>
-	</ul>
-
-	<h2>Quick actions</h2>
-	<ul>
-		<li><a href="/mtg-helper/card-search">Card Search</a></li>
-		<li><a href="/mtg-helper/deck-compare">Deck Compare</a></li>
-		<li><a href="/mtg-helper/navbar">Navigation</a></li>
-	</ul>
+	</section>
 </div>
