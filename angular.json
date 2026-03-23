@@ -29,7 +29,8 @@
 						"styles": [
 							"src/styles.css"
 						],
-						"scripts": []
+						"scripts": [],
+						"baseHref": "/mtg-helper/"
 					},
 					"configurations": {
 						"production": {
