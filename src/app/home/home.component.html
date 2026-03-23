@@ -1,26 +1,37 @@
 <div class="text-center mt-5">
-	<h1 class="display-4">Welcome to MTG Helper</h1>
-	<p class="lead">Your ultimate tool for Magic: The Gathering card management and deck building.</p>
-	<p class="text-muted">Updated on March 23, 2026</p>
+	<h1 class="display-4">MTG Helper - User Guide</h1>
+	<p class="lead">A shared toolkit for Magic: The Gathering players to search cards, compare decks, and improve
+		strategy.</p>
+	<p class="text-muted">Helpful instructions for site visitors and contributors.</p>
 </div>
 <div class="container mt-4">
-	<h2>Features</h2>
+	<h2>Who should use this site?</h2>
 	<ul>
-		<li>Find cards by name, set, type, or price.</li>
-		<li>Compare decks side-by-side and analyze synergies.</li>
-		<li>Track favorites and build your collection database.</li>
-		<li>Supports advanced filtering for colors, formats, and rarity.</li>
+		<li>Casual and competitive MTG players wanting quick card data access.</li>
+		<li>Deck builders looking for side-by-side deck statistics.</li>
+		<li>Collectors tracking collection composition by format and rarity.</li>
+		<li>Developers or contributors exploring a live Angular sample project.</li>
 	</ul>
 
-	<h2>Getting Started</h2>
+	<h2>How to navigate</h2>
 	<ol>
-		<li>Go to <strong>Card Search</strong> to look up cards.</li>
-		<li>Add cards to your deck and fine-tune with the <strong>Deck Compare</strong> tool.</li>
-		<li>Use the <strong>Navbar</strong> links to navigate quickly between sections.</li>
-		<li>Deploy new updates with <code>ng deploy</code> when ready.</li>
+		<li>Click <strong>Card Search</strong> to find cards by name, set, type, or price.</li>
+		<li>Use <strong>Deck Compare</strong> to load two decks for matchup insights and overlap analysis.</li>
+		<li>Open the <strong>Navbar</strong> to reach the home, search, and compare pages any time.</li>
+		<li>Use <strong>Browser DevTools</strong> console for debug and state inspection while testing.</li>
 	</ol>
 
-	<h2>Tips</h2>
-	<p>For best performance, use modern browsers and keep your dataset filtered to your preferred formats. Your deck can
-		evolve quickly with the built-in suggestions where available.</p>
+	<h2>Contributing</h2>
+	<ul>
+		<li>To edit content, modify <code>src/app/home/home.component.html</code>.</li>
+		<li>Run locally with <code>npm install</code> and <code>ng serve</code> for development preview.</li>
+		<li>Push changes to <code>master</code> and run <code>ng deploy</code> to publish.</li>
+		<li>Ensure GitHub Pages is set to <strong>gh-pages</strong> branch / root folder in repository settings.</li>
+	</ul>
+
+	<h2>Quick troubleshooting</h2>
+	<p>If old README appears online, clear browser cache and verify the pages source branch in GitHub settings, then
+		redeploy with <code>ng deploy</code>.</p>
+	<p>For extension, add content in <code>src/app/home/home.component.html</code> and sync via standard git workflows.
+	</p>
 </div>
