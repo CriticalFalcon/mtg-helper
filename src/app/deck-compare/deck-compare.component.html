@@ -16,9 +16,8 @@
 				<div>
 					<label for="leftDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
 					<input type="text" id="leftDeckUrl" [(ngModel)]="leftDeckUrl" class="form-control mb-2"
-						placeholder="https://archidekt.com/decks/...">
-					<div class="form-text mb-2">Archidekt URLs are supported. For Moxfield, use the Paste Decklist tab
-						with an exported list.</div>
+						placeholder="https://moxfield.com/decks/... or https://archidekt.com/decks/...">
+					<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
 					<button class="btn btn-primary mt-2 btn-sm rounded-pill"
 						(click)="importFromUrl(leftDeckUrl, 'left')" [disabled]="leftLoading">
 						@if (leftLoading) {
@@ -67,9 +66,8 @@
 				<div>
 					<label for="rightDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
 					<input type="text" id="rightDeckUrl" [(ngModel)]="rightDeckUrl" class="form-control mb-2"
-						placeholder="https://archidekt.com/decks/...">
-					<div class="form-text mb-2">Archidekt URLs are supported. For Moxfield, use the Paste Decklist tab
-						with an exported list.</div>
+						placeholder="https://moxfield.com/decks/... or https://archidekt.com/decks/...">
+					<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
 					<button class="btn btn-primary mt-2 btn-sm rounded-pill"
 						(click)="importFromUrl(rightDeckUrl, 'right')" [disabled]="rightLoading">
 						@if (rightLoading) {

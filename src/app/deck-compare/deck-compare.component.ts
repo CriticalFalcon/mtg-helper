@@ -116,19 +116,140 @@ export class DeckCompareComponent {
 			return;
 		}
 
-		const moxfieldMatch = url.match(/moxfield\.com\//);
-		const archidektMatch = url.match(/archidekt\.com\/decks\/(\d+)/);
+		const moxfieldMatch = url.match(/(?:www\.)?moxfield\.com\/decks\/([A-Za-z0-9_-]+)/i);
+		const archidektMatch = url.match(/archidekt\.com\/decks\/(\d+)/i);
 
 		if (moxfieldMatch) {
-			this.setError(
-				side,
-				'Moxfield URL import is currently unavailable because Moxfield blocks automated requests. Paste the Moxfield export in the decklist tab instead.'
-			);
+			this.importFromMoxfield(moxfieldMatch[1], side);
 		} else if (archidektMatch) {
 			this.importFromArchidekt(archidektMatch[1], side);
 		} else {
-			this.setError(side, 'Invalid URL. Use an Archidekt deck URL, or paste a decklist export.');
+			this.setError(side, 'Invalid URL. Use a Moxfield or Archidekt deck URL, or paste a decklist export.');
 		}
+	}
+
+	private importFromMoxfield(deckId: string, side: 'left' | 'right') {
+		if (side === 'left') this.leftLoading = true;
+		else this.rightLoading = true;
+		this.setError(side, '');
+
+		const params = new URLSearchParams();
+		params.append('source', 'moxfield');
+		params.append('id', deckId);
+
+		const proxyUrl = `http://localhost:3001/api/deck?${params.toString()}`;
+
+		this.http.get<any>(proxyUrl).subscribe({
+			next: (data) => {
+				const cards: { [name: string]: number } = {};
+				const sideboard: { [name: string]: number } = {};
+				let commander: string | null = null;
+
+				this.extractMoxfieldBoards(data).forEach((board) => {
+					if (board.kind === 'tokens') {
+						return;
+					}
+
+					for (const card of board.cards) {
+						if (!card.name || card.count <= 0) {
+							continue;
+						}
+
+						if (board.kind === 'commander') {
+							commander = card.name;
+							continue;
+						}
+
+						if (board.kind === 'sideboard') {
+							sideboard[card.name] = (sideboard[card.name] || 0) + card.count;
+							continue;
+						}
+
+						cards[card.name] = (cards[card.name] || 0) + card.count;
+					}
+				});
+
+				this.processParsedDeck(cards, commander, Object.keys(sideboard).length ? sideboard : null, side);
+			},
+			error: () => {
+				this.setError(side, 'Failed to load deck from Moxfield. Make sure the proxy server is running on port 3001 (npm run proxy), the deck is public, and the URL is correct.');
+				if (side === 'left') this.leftLoading = false;
+				else this.rightLoading = false;
+			},
+		});
+	}
+
+	private extractMoxfieldBoards(data: any): Array<{ kind: 'main' | 'commander' | 'sideboard' | 'tokens'; cards: Array<{ name: string; count: number }> }> {
+		const boards: Array<{ kind: 'main' | 'commander' | 'sideboard' | 'tokens'; cards: Array<{ name: string; count: number }> }> = [];
+		const sourceBoards = data?.boards && typeof data.boards === 'object' ? data.boards : null;
+
+		if (sourceBoards) {
+			Object.entries(sourceBoards).forEach(([boardName, boardValue]) => {
+				const normalizedName = String(boardName).toLowerCase();
+				const kind = this.mapMoxfieldBoardKind(normalizedName);
+				boards.push({
+					kind,
+					cards: this.extractMoxfieldCards(boardValue),
+				});
+			});
+		}
+
+		if (boards.length > 0) {
+			return boards;
+		}
+
+		// Fallback for alternate payload shapes.
+		if (data?.commanders) {
+			boards.push({ kind: 'commander', cards: this.extractMoxfieldCards(data.commanders) });
+		}
+		if (data?.sideboard) {
+			boards.push({ kind: 'sideboard', cards: this.extractMoxfieldCards(data.sideboard) });
+		}
+		if (data?.mainboard) {
+			boards.push({ kind: 'main', cards: this.extractMoxfieldCards(data.mainboard) });
+		}
+
+		return boards;
+	}
+
+	private mapMoxfieldBoardKind(boardName: string): 'main' | 'commander' | 'sideboard' | 'tokens' {
+		if (/token|emblem|helper|extra/.test(boardName)) {
+			return 'tokens';
+		}
+		if (/commander/.test(boardName)) {
+			return 'commander';
+		}
+		if (/sideboard|maybeboard/.test(boardName)) {
+			return 'sideboard';
+		}
+		return 'main';
+	}
+
+	private extractMoxfieldCards(boardData: any): Array<{ name: string; count: number }> {
+		if (!boardData) {
+			return [];
+		}
+
+		const normalizedEntries = Array.isArray(boardData)
+			? boardData
+			: Array.isArray(boardData?.cards)
+				? boardData.cards
+				: boardData?.cards && typeof boardData.cards === 'object'
+					? Object.values(boardData.cards)
+					: typeof boardData === 'object'
+						? Object.values(boardData)
+						: [];
+
+		return normalizedEntries
+			.map((entry: any) => {
+				const name = entry?.card?.name || entry?.name || entry?.cardName || entry?.card_title || '';
+				const count = Number(entry?.quantity ?? entry?.count ?? entry?.qty ?? 1);
+				return {
+					name: String(name).trim(),
+					count: Number.isFinite(count) && count > 0 ? count : 1,
+				};
+			})
+			.filter((card: { name: string; count: number }) => card.name.length > 0);
 	}
 
 	private importFromArchidekt(deckId: string, side: 'left' | 'right') {
