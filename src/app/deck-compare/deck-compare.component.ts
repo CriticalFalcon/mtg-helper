@@ -2,7 +2,7 @@ import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { Observable, catchError, finalize, forkJoin, map, of, shareReplay, tap } from 'rxjs';
 
 interface GroupedCards {
 	[type: string]: { name: string; count: number }[];
@@ -16,6 +16,9 @@ interface GroupedCards {
 	styleUrls: ['./deck-compare.component.css'],
 })
 export class DeckCompareComponent {
+	private readonly scryfallCardCache = new Map<string, any>();
+	private readonly scryfallPendingRequests = new Map<string, Observable<any>>();
+
 	private readonly sideboardPreferenceKeys = {
 		left: 'mtg-helper:deck-compare:left-sideboard-expanded',
 		right: 'mtg-helper:deck-compare:right-sideboard-expanded',
@@ -40,6 +43,8 @@ export class DeckCompareComponent {
 	rightDeckText: string = '';
 	leftDeckUrl: string = '';
 	rightDeckUrl: string = '';
+	leftDeckTitle: string = 'Deck 1';
+	rightDeckTitle: string = 'Deck 2';
 
 	leftGroupedCards: GroupedCards = {};
 	rightGroupedCards: GroupedCards = {};
@@ -93,17 +98,10 @@ export class DeckCompareComponent {
 	}
 
 	onCardHover(cardName: string) {
-		this.http
-			.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
-			.subscribe({
-				next: (data) => {
-					this.hoveredCardImage =
-						data.image_uris?.normal || data.card_faces?.[0]?.image_uris?.normal || null;
-				},
-				error: () => {
-					this.hoveredCardImage = null;
-				},
-			});
+		this.getScryfallCard(cardName).subscribe((data) => {
+			this.hoveredCardImage =
+				data?.image_uris?.normal || data?.card_faces?.[0]?.image_uris?.normal || null;
+		});
 	}
 
 	onCardLeave() {
@@ -133,14 +131,12 @@ export class DeckCompareComponent {
 		else this.rightLoading = true;
 		this.setError(side, '');
 
-		const params = new URLSearchParams();
-		params.append('source', 'moxfield');
-		params.append('id', deckId);
+		const moxfieldUrl = `https://api.proxxied.com/api/moxfield/decks/${encodeURIComponent(deckId)}`;
 
-		const proxyUrl = `http://localhost:3001/api/deck?${params.toString()}`;
-
-		this.http.get<any>(proxyUrl).subscribe({
+		this.http.get<any>(moxfieldUrl).subscribe({
 			next: (data) => {
+				this.setDeckTitle(side, this.extractDeckName(data));
+
 				const cards: { [name: string]: number } = {};
 				const sideboard: { [name: string]: number } = {};
 				let commander: string | null = null;
@@ -172,7 +168,7 @@ export class DeckCompareComponent {
 				this.processParsedDeck(cards, commander, Object.keys(sideboard).length ? sideboard : null, side);
 			},
 			error: () => {
-				this.setError(side, 'Failed to load deck from Moxfield. Make sure the proxy server is running on port 3001 (npm run proxy), the deck is public, and the URL is correct.');
+				this.setError(side, 'Failed to load deck from Moxfield. Make sure the deck is public and the URL is correct.');
 				if (side === 'left') this.leftLoading = false;
 				else this.rightLoading = false;
 			},
@@ -256,15 +252,12 @@ export class DeckCompareComponent {
 		if (side === 'left') this.leftLoading = true;
 		else this.rightLoading = true;
 		this.setError(side, '');
+		const archidektUrl = `https://api.proxxied.com/api/archidekt/decks/${encodeURIComponent(deckId)}`;
 
-		const params = new URLSearchParams();
-		params.append('source', 'archidekt');
-		params.append('id', deckId);
-
-		const proxyUrl = `http://localhost:3001/api/deck?${params.toString()}`;
-
-		this.http.get<any>(proxyUrl).subscribe({
+		this.http.get<any>(archidektUrl).subscribe({
 			next: (data) => {
+				this.setDeckTitle(side, this.extractDeckName(data));
+
 				const cards: { [name: string]: number } = {};
 				const sideboard: { [name: string]: number } = {};
 				let commander: string | null = null;
@@ -294,7 +287,7 @@ export class DeckCompareComponent {
 				this.processParsedDeck(cards, commander, Object.keys(sideboard).length ? sideboard : null, side);
 			},
 			error: (err) => {
-				this.setError(side, 'Failed to load deck from Archidekt. Make sure the proxy server is running on port 3001 (npm run proxy) and the URL is correct.');
+				this.setError(side, 'Failed to load deck from Archidekt. Make sure the deck is public and the URL is correct.');
 				if (side === 'left') this.leftLoading = false;
 				else this.rightLoading = false;
 			},
@@ -456,10 +449,13 @@ export class DeckCompareComponent {
 			return of(false);
 		}
 
-		return this.http
-			.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
+		return this.getScryfallCard(cardName)
 			.pipe(
 				map((data) => {
+					if (!data) {
+						return false;
+					}
+
 					const typeLine = data.type_line || data.card_faces?.[0]?.type_line || '';
 					const oracleText = [data.oracle_text, ...(data.card_faces?.map((face: any) => face.oracle_text) || [])]
 						.filter(Boolean)
@@ -469,8 +465,7 @@ export class DeckCompareComponent {
 					const isLegendaryLeader = /legendary/i.test(typeLine) && /(creature|planeswalker)/i.test(typeLine);
 					const hasCommanderText = /can be your commander|choose a background|doctor's companion|friends forever|partner/.test(oracleText);
 					return commanderLegality && commanderLegality !== 'not_legal' && (isLegendaryLeader || hasCommanderText);
-				}),
-				catchError(() => of(false))
+				})
 			);
 	}
 
@@ -544,41 +539,70 @@ export class DeckCompareComponent {
 			return;
 		}
 		Object.keys(counts).forEach((cardName) => {
-			this.http
-				.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
-				.subscribe({
-					next: (data) => {
-						const typeLine = data.card_faces?.[0]?.type_line || data.type_line || 'Other';
-						const group = groupOverride || this.mapTypeToGroup(typeLine);
-						if (!grouped[group]) grouped[group] = [];
+			this.getScryfallCard(cardName).subscribe((data) => {
+				if (data) {
+					const typeLine = data.card_faces?.[0]?.type_line || data.type_line || 'Other';
+					const group = groupOverride || this.mapTypeToGroup(typeLine);
+					if (!grouped[group]) grouped[group] = [];
 
-						const existing = grouped[group].find((c) => c.name.toLowerCase() === data.name.toLowerCase());
-						if (existing) {
-							existing.count += counts[cardName];
-						} else {
-							grouped[group].push({ name: data.name, count: counts[cardName] });
-						}
+					const existing = grouped[group].find((c) => c.name.toLowerCase() === data.name.toLowerCase());
+					if (existing) {
+						existing.count += counts[cardName];
+					} else {
+						grouped[group].push({ name: data.name, count: counts[cardName] });
+					}
+				} else {
+					const group = groupOverride || 'Unknown';
+					if (!grouped[group]) grouped[group] = [];
+					const existing = grouped[group].find((c) => c.name.toLowerCase() === cardName.toLowerCase());
+					if (existing) {
+						existing.count += counts[cardName];
+					} else {
+						grouped[group].push({ name: cardName, count: counts[cardName] });
+					}
+				}
 
-						if (--pending === 0) {
-							this.updateGroupedCards(side, grouped);
-						}
-					},
-					error: () => {
-						const group = groupOverride || 'Unknown';
-						if (!grouped[group]) grouped[group] = [];
-						const existing = grouped[group].find((c) => c.name.toLowerCase() === cardName.toLowerCase());
-						if (existing) {
-							existing.count += counts[cardName];
-						} else {
-							grouped[group].push({ name: cardName, count: counts[cardName] });
-						}
-
-						if (--pending === 0) {
-							this.updateGroupedCards(side, grouped);
-						}
-					},
-				});
+				if (--pending === 0) {
+					this.updateGroupedCards(side, grouped);
+				}
+			});
 		});
+	}
+
+	private getScryfallCard(cardName: string): Observable<any> {
+		const normalizedName = cardName.trim();
+		if (!normalizedName) {
+			return of(null);
+		}
+
+		const cacheKey = normalizedName.toLowerCase();
+		const cachedCard = this.scryfallCardCache.get(cacheKey);
+		if (cachedCard) {
+			return of(cachedCard);
+		}
+
+		const pendingRequest = this.scryfallPendingRequests.get(cacheKey);
+		if (pendingRequest) {
+			return pendingRequest;
+		}
+
+		const request$ = this.http
+			.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(normalizedName)}`)
+			.pipe(
+				tap((data) => {
+					if (data) {
+						this.scryfallCardCache.set(cacheKey, data);
+					}
+				}),
+				catchError(() => of(null)),
+				finalize(() => {
+					this.scryfallPendingRequests.delete(cacheKey);
+				}),
+				shareReplay(1)
+			);
+
+		this.scryfallPendingRequests.set(cacheKey, request$);
+		return request$;
 	}
 
 	private updateGroupedCards(side: 'left' | 'right', grouped: GroupedCards) {
@@ -617,6 +641,22 @@ export class DeckCompareComponent {
 		} else {
 			this.rightError = message;
 		}
+	}
+
+	private setDeckTitle(side: 'left' | 'right', deckName: string | null) {
+		const fallbackTitle = side === 'left' ? 'Deck 1' : 'Deck 2';
+		const trimmedDeckName = deckName?.trim();
+		const finalTitle = trimmedDeckName && trimmedDeckName.length > 0 ? trimmedDeckName : fallbackTitle;
+
+		if (side === 'left') {
+			this.leftDeckTitle = finalTitle;
+		} else {
+			this.rightDeckTitle = finalTitle;
+		}
+	}
+
+	private extractDeckName(data: any): string | null {
+		return data?.name || data?.deckName || data?.title || data?.deck?.name || null;
 	}
 
 	getGroupKeys(side: 'left' | 'right'): string[] {
