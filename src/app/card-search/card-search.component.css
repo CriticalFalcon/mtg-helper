@@ -53,6 +53,11 @@
 	line-height: 1.6;
 }
 
+.card-text-box {
+	background-color: var(--bs-tertiary-bg);
+	border-color: var(--bs-border-color) !important;
+}
+
 .card-text-oracle p:last-child {
 	margin-bottom: 0;
 }

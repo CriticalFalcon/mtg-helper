@@ -6,9 +6,9 @@
 	width: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
 	height: calc(var(--bs-navbar-toggler-height, 38px) - 4px);
 	border-radius: 50%;
-	border: 1.5px solid #94a3b8;
-	background: #ffffff;
-	color: #1e293b;
+	border: 1.5px solid var(--bs-border-color);
+	background: var(--bs-body-bg);
+	color: var(--bs-emphasis-color);
 	font-size: 1.25rem;
 	transition:
 		background 0.25s ease,
@@ -22,19 +22,19 @@
 
 /* Hover effect */
 .dark-toggle-btn:hover {
-	background: #f0f4f8;
+	background: var(--bs-tertiary-bg);
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 	transform: scale(1.05);
-	color: #64748b;
+	color: var(--bs-secondary-color);
 	transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease, color 0.3s ease;
 }
 
 /* Active (dark mode on) */
 .dark-toggle-btn.active {
-	background: #1f2937;
-	color: #facc15;
-	border-color: #facc15;
-	box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+	background: var(--bs-dark);
+	color: var(--bs-warning);
+	border-color: var(--bs-warning);
+	box-shadow: 0 0 12px rgba(var(--bs-warning-rgb), 0.6);
 	animation: glowPulse 4s infinite ease-in-out;
 	animation-name: glowPulse;
 }
@@ -53,11 +53,11 @@
 
 	0%,
 	100% {
-		box-shadow: 0 0 6px rgba(250, 204, 21, 0.3);
+		box-shadow: 0 0 6px rgba(var(--bs-warning-rgb), 0.3);
 	}
 
 	50% {
-		box-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+		box-shadow: 0 0 12px rgba(var(--bs-warning-rgb), 0.6);
 	}
 }
 
@@ -66,11 +66,11 @@
 
 	0%,
 	100% {
-		box-shadow: 0 0 5px rgba(100, 116, 139, 0.15);
+		box-shadow: 0 0 5px rgba(var(--bs-secondary-rgb), 0.15);
 	}
 
 	50% {
-		box-shadow: 0 0 12px rgba(100, 116, 139, 0.3);
+		box-shadow: 0 0 12px rgba(var(--bs-secondary-rgb), 0.3);
 	}
 }
 
@@ -79,8 +79,8 @@
 }
 
 .navbar .list-group-item.active {
-	background-color: #0d6efd;
-	color: white;
+	background-color: var(--bs-primary);
+	color: var(--bs-white);
 }
 
 /* navbar.component.css */
