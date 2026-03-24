@@ -16,6 +16,26 @@ interface GroupedCards {
 	styleUrls: ['./deck-compare.component.css'],
 })
 export class DeckCompareComponent {
+	private readonly sideboardPreferenceKeys = {
+		left: 'mtg-helper:deck-compare:left-sideboard-expanded',
+		right: 'mtg-helper:deck-compare:right-sideboard-expanded',
+	};
+
+	private readonly groupOrder = [
+		'Commander',
+		'Battles',
+		'Planeswalkers',
+		'Creatures',
+		'Sorceries',
+		'Instants',
+		'Artifacts',
+		'Enchantments',
+		'Lands',
+		'Other',
+		'Unknown',
+		'Sideboard',
+	];
+
 	leftDeckText: string = '';
 	rightDeckText: string = '';
 	leftDeckUrl: string = '';
@@ -30,6 +50,8 @@ export class DeckCompareComponent {
 
 	// Toggle for showing only differences
 	showDifferencesOnly = false;
+	leftSideboardExpanded = false;
+	rightSideboardExpanded = false;
 
 	// Loading/error states
 	leftLoading = false;
@@ -41,7 +63,10 @@ export class DeckCompareComponent {
 	leftUseUrl = true;
 	rightUseUrl = true;
 
-	constructor(private http: HttpClient) { }
+	constructor(private http: HttpClient) {
+		this.leftSideboardExpanded = this.getStoredSideboardPreference('left');
+		this.rightSideboardExpanded = this.getStoredSideboardPreference('right');
+	}
 
 	// Track mouse position globally so the image follows
 	@HostListener('document:mousemove', ['$event'])
@@ -456,22 +481,8 @@ export class DeckCompareComponent {
 	}
 
 	sortGroups(groups: GroupedCards): GroupedCards {
-		const order = [
-			'Commander',
-			'Battles',
-			'Planeswalkers',
-			'Creatures',
-			'Sorceries',
-			'Instants',
-			'Artifacts',
-			'Enchantments',
-			'Lands',
-			'Other',
-			'Unknown',
-			'Sideboard',
-		];
 		const sorted: GroupedCards = {};
-		order.forEach((type) => {
+		this.groupOrder.forEach((type) => {
 			if (groups[type]) {
 				sorted[type] = groups[type].sort((a, b) => a.name.localeCompare(b.name));
 			}
@@ -491,17 +502,34 @@ export class DeckCompareComponent {
 		return Object.keys(side === 'left' ? this.leftGroupedCards : this.rightGroupedCards);
 	}
 
-	getGroupCount(side: 'left' | 'right', group: string): number {
-		const data = side === 'left' ? this.leftGroupedCards : this.rightGroupedCards;
-		if (!data[group]) return 0;
+	getComparisonGroupKeys(): string[] {
+		return this.groupOrder.filter((group) => this.shouldDisplayGroup(group));
+	}
 
-		// If "show differences only" is on, count only the filtered cards
-		if (this.showDifferencesOnly) {
-			return this.filterDifferentCards(data[group], side).reduce((acc, c) => acc + c.count, 0);
+	getVisibleCardsForGroup(side: 'left' | 'right', group: string): { name: string; count: number }[] {
+		const data = side === 'left' ? this.leftGroupedCards : this.rightGroupedCards;
+		const cards = data[group] || [];
+		return this.showDifferencesOnly ? this.filterDifferentCards(cards, side) : cards;
+	}
+
+	hasGroupCards(side: 'left' | 'right', group: string): boolean {
+		return this.getVisibleCardsForGroup(side, group).length > 0;
+	}
+
+	isGroupExpanded(side: 'left' | 'right', group: string): boolean {
+		if (group !== 'Sideboard') {
+			return true;
 		}
 
-		// Otherwise, count everything
-		return data[group].reduce((acc, c) => acc + c.count, 0);
+		return side === 'left' ? this.leftSideboardExpanded : this.rightSideboardExpanded;
+	}
+
+	shouldDisplayGroup(group: string): boolean {
+		return this.hasGroupCards('left', group) || this.hasGroupCards('right', group);
+	}
+
+	getGroupCount(side: 'left' | 'right', group: string): number {
+		return this.getVisibleCardsForGroup(side, group).reduce((acc, c) => acc + c.count, 0);
 	}
 
 	cardExistsOnSide(cardName: string, side: 'left' | 'right'): boolean {
@@ -514,6 +542,35 @@ export class DeckCompareComponent {
 	// Toggle show differences only
 	toggleShowDifferences() {
 		this.showDifferencesOnly = !this.showDifferencesOnly;
+	}
+
+	toggleSideboardVisibility(side: 'left' | 'right') {
+		const nextValue = !(side === 'left' ? this.leftSideboardExpanded : this.rightSideboardExpanded);
+
+		if (side === 'left') {
+			this.leftSideboardExpanded = nextValue;
+		} else {
+			this.rightSideboardExpanded = nextValue;
+		}
+
+		this.storeSideboardPreference(side, nextValue);
+	}
+
+	private getStoredSideboardPreference(side: 'left' | 'right'): boolean {
+		try {
+			const storedValue = globalThis.localStorage?.getItem(this.sideboardPreferenceKeys[side]);
+			return storedValue === 'true';
+		} catch {
+			return false;
+		}
+	}
+
+	private storeSideboardPreference(side: 'left' | 'right', isExpanded: boolean) {
+		try {
+			globalThis.localStorage?.setItem(this.sideboardPreferenceKeys[side], String(isExpanded));
+		} catch {
+			// Ignore storage failures; the toggle still works for the current session.
+		}
 	}
 
 	// Filter cards based on showDifferencesOnly toggle

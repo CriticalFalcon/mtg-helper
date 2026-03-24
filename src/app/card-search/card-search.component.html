@@ -26,9 +26,9 @@
 					}
 				</span>
 			</h1>
-			<p class="card-text-type-line">{{ typeLine }}</p>
+			<p class="card-text-type-line text-secondary">{{ typeLine }}</p>
 			<!-- Oracle Text -->
-			<div class="card-text-box">
+			<div class="card-text-box bg-light border rounded-3 p-3 mb-3 shadow-sm">
 				<div class="card-text-oracle">
 					@for (paragraph of (oracleText?.split('\n') || []); track paragraph) {
 					<p>
