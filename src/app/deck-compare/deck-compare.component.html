@@ -1,106 +1,180 @@
 <div class="container-fluid mt-4">
-  <div class="row">
-    <!-- Left Input Column -->
-    <div class="col-md-6 d-flex flex-column p-3">
-      <div class="mb-4">
-        <label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
-        <textarea id="leftRawDecklist" [(ngModel)]="leftDeckText" class="form-control expandable-textarea"
-        placeholder="Paste here" rows="6"></textarea>
-        <button class="btn btn-primary mt-3 btn-sm btn-pill" (click)="processDecklist(leftDeckText, 'left')">
-          Import Deck 1
-        </button>
-      </div>
-    </div>
+	<div class="row">
+		<!-- Left Input Column -->
+		<div class="col-md-6 d-flex flex-column p-3">
+			<div class="mb-4">
+				<!-- Tabs -->
+				<div class="btn-group mb-3" role="tablist">
+					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="leftUseUrl"
+						(click)="leftUseUrl = true">Import from URL</button>
+					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="!leftUseUrl"
+						(click)="leftUseUrl = false">Paste Decklist</button>
+				</div>
 
-    <!-- Right Input Column -->
-    <div class="col-md-6 d-flex flex-column p-3">
-      <div class="mb-4">
-        <label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
-        <textarea id="rightRawDecklist" [(ngModel)]="rightDeckText" class="form-control expandable-textarea"
-        placeholder="Paste here" rows="6"></textarea>
-        <button class="btn btn-primary mt-3 btn-sm btn-pill" (click)="processDecklist(rightDeckText, 'right')">
-          Import Deck 2
-        </button>
-      </div>
-    </div>
-  </div>
+				<!-- URL Input -->
+				@if (leftUseUrl) {
+				<div>
+					<label for="leftDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
+					<input type="text" id="leftDeckUrl" [(ngModel)]="leftDeckUrl" class="form-control mb-2"
+						placeholder="https://archidekt.com/decks/...">
+					<div class="form-text mb-2">Archidekt URLs are supported. For Moxfield, use the Paste Decklist tab
+						with an exported list.</div>
+					<button class="btn btn-primary mt-2 btn-sm btn-pill" (click)="importFromUrl(leftDeckUrl, 'left')"
+						[disabled]="leftLoading">
+						@if (leftLoading) {
+						<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+						Loading...
+						} @else {
+						Import Deck 1
+						}
+					</button>
+					@if (leftError) {
+					<div class="alert alert-danger mt-2 mb-0 py-2">{{ leftError }}</div>
+					}
+				</div>
+				}
 
-  <!-- Toggle Button Centered Below Inputs -->
-  <div class="d-flex justify-content-center my-3">
-    <button type="button" class="btn btn-outline-primary btn-pill" [class.active]="showDifferencesOnly"
-      (click)="toggleShowDifferences()" [attr.aria-pressed]="showDifferencesOnly"
-      title="Show only cards that differ between decks">
-      Show Differences
-    </button>
-  </div>
+				<!-- Paste Decklist -->
+				@if (!leftUseUrl) {
+				<div>
+					<label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
+					<textarea id="leftRawDecklist" [(ngModel)]="leftDeckText" class="form-control expandable-textarea"
+						placeholder="Paste here" rows="6"></textarea>
+					<div class="form-text">Supports commander exports with the commander at either the top or the bottom
+						of the list.</div>
+					<button class="btn btn-primary mt-3 btn-sm btn-pill"
+						(click)="processDecklist(leftDeckText, 'left')">
+						Import Deck 1
+					</button>
+				</div>
+				}
+			</div>
+		</div>
 
-  <!-- Deck Lists Columns -->
-  <div class="row h-100">
-    <!-- Left Deck Groups -->
-    <div class="col-md-6 d-flex flex-column p-3">
-      <h5 class="deck-header text-center d-md-none mb-2">Deck 1</h5>
-      @for (group of getGroupKeys('left'); track group) {
-        @if (filterDifferentCards(leftGroupedCards[group], 'left').length > 0 || !showDifferencesOnly) {
-          <div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
-            class="group-container mt-3"
-            >
-            <div class="group-header">
-              {{ group }}
-              <span class="group-count">{{ getFilteredGroupCount(leftGroupedCards[group], 'left') }}</span>
-            </div>
-            <ul class="card-list">
-              @for (card of filterDifferentCards(leftGroupedCards[group], 'left'); track card) {
-                <li class="card-item"
-                  (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-                  <span>{{ card.count }}&emsp;{{ card.name }}</span>
-                  @if (group !== 'Sideboard') {
-                    <span class="status-circle"
-                      [ngClass]="cardExistsOnSide(card.name, 'left') ? 'circle-green' : 'circle-yellow'">
-                    </span>
-                  }
-                </li>
-              }
-            </ul>
-          </div>
-        }
-      }
-    </div>
-    <!-- Mobile horizontal separator -->
-    <div class="deck-separator d-md-none"></div>
-    <!-- Right Deck Groups -->
-    <div class="col-md-6 d-flex flex-column p-3">
-      <h5 class="deck-header text-center d-md-none mb-2">Deck 2</h5>
-      @for (group of getGroupKeys('right'); track group) {
-        @if (filterDifferentCards(rightGroupedCards[group], 'right').length > 0 || !showDifferencesOnly) {
-          <div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
-            class="group-container mt-3"
-            >
-            <div class="group-header">
-              {{ group }}
-              <span class="group-count">{{ getFilteredGroupCount(rightGroupedCards[group], 'right') }}</span>
-            </div>
-            <ul class="card-list">
-              @for (card of filterDifferentCards(rightGroupedCards[group], 'right'); track card) {
-                <li
-                  class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-                  <span>{{ card.count }}&emsp;{{ card.name }}</span>
-                  @if (group !== 'Sideboard') {
-                    <span class="status-circle"
-                      [ngClass]="cardExistsOnSide(card.name, 'right') ? 'circle-green' : 'circle-yellow'">
-                    </span>
-                  }
-                </li>
-              }
-            </ul>
-          </div>
-        }
-      }
-    </div>
-  </div>
+		<!-- Right Input Column -->
+		<div class="col-md-6 d-flex flex-column p-3">
+			<div class="mb-4">
+				<!-- Tabs -->
+				<div class="btn-group mb-3" role="tablist">
+					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="rightUseUrl"
+						(click)="rightUseUrl = true">Import from URL</button>
+					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="!rightUseUrl"
+						(click)="rightUseUrl = false">Paste Decklist</button>
+				</div>
 
-  <!-- Floating card image -->
-  @if (hoveredCardImage) {
-    <img [src]="hoveredCardImage" class="card-preview" [style.left.px]="hoverCardPosition.x"
-      [style.top.px]="hoverCardPosition.y" />
-  }
+				<!-- URL Input -->
+				@if (rightUseUrl) {
+				<div>
+					<label for="rightDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
+					<input type="text" id="rightDeckUrl" [(ngModel)]="rightDeckUrl" class="form-control mb-2"
+						placeholder="https://archidekt.com/decks/...">
+					<div class="form-text mb-2">Archidekt URLs are supported. For Moxfield, use the Paste Decklist tab
+						with an exported list.</div>
+					<button class="btn btn-primary mt-2 btn-sm btn-pill" (click)="importFromUrl(rightDeckUrl, 'right')"
+						[disabled]="rightLoading">
+						@if (rightLoading) {
+						<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+						Loading...
+						} @else {
+						Import Deck 2
+						}
+					</button>
+					@if (rightError) {
+					<div class="alert alert-danger mt-2 mb-0 py-2">{{ rightError }}</div>
+					}
+				</div>
+				}
+
+				<!-- Paste Decklist -->
+				@if (!rightUseUrl) {
+				<div>
+					<label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
+					<textarea id="rightRawDecklist" [(ngModel)]="rightDeckText" class="form-control expandable-textarea"
+						placeholder="Paste here" rows="6"></textarea>
+					<div class="form-text">Supports commander exports with the commander at either the top or the bottom
+						of the list.</div>
+					<button class="btn btn-primary mt-3 btn-sm btn-pill"
+						(click)="processDecklist(rightDeckText, 'right')">
+						Import Deck 2
+					</button>
+				</div>
+				}
+			</div>
+		</div>
+	</div>
+
+	<!-- Toggle Button Centered Below Inputs -->
+	<div class="d-flex justify-content-center my-3">
+		<button type="button" class="btn btn-outline-primary btn-pill" [class.active]="showDifferencesOnly"
+			(click)="toggleShowDifferences()" [attr.aria-pressed]="showDifferencesOnly"
+			title="Show only cards that differ between decks">
+			Show Differences
+		</button>
+	</div>
+
+	<!-- Deck Lists Columns -->
+	<div class="row h-100">
+		<!-- Left Deck Groups -->
+		<div class="col-md-6 d-flex flex-column p-3">
+			<h5 class="deck-header text-center d-md-none mb-2">Deck 1</h5>
+			@for (group of getGroupKeys('left'); track group) {
+			@if (filterDifferentCards(leftGroupedCards[group], 'left').length > 0 || !showDifferencesOnly) {
+			<div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
+				class="group-container mt-3">
+				<div class="group-header">
+					{{ group }}
+					<span class="group-count">{{ getFilteredGroupCount(leftGroupedCards[group], 'left') }}</span>
+				</div>
+				<ul class="card-list">
+					@for (card of filterDifferentCards(leftGroupedCards[group], 'left'); track card) {
+					<li class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
+						<span>{{ card.count }}&emsp;{{ card.name }}</span>
+						@if (group !== 'Sideboard') {
+						<span class="status-circle"
+							[ngClass]="cardExistsOnSide(card.name, 'left') ? 'circle-green' : 'circle-yellow'">
+						</span>
+						}
+					</li>
+					}
+				</ul>
+			</div>
+			}
+			}
+		</div>
+		<!-- Mobile horizontal separator -->
+		<div class="deck-separator d-md-none"></div>
+		<!-- Right Deck Groups -->
+		<div class="col-md-6 d-flex flex-column p-3">
+			<h5 class="deck-header text-center d-md-none mb-2">Deck 2</h5>
+			@for (group of getGroupKeys('right'); track group) {
+			@if (filterDifferentCards(rightGroupedCards[group], 'right').length > 0 || !showDifferencesOnly) {
+			<div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
+				class="group-container mt-3">
+				<div class="group-header">
+					{{ group }}
+					<span class="group-count">{{ getFilteredGroupCount(rightGroupedCards[group], 'right') }}</span>
+				</div>
+				<ul class="card-list">
+					@for (card of filterDifferentCards(rightGroupedCards[group], 'right'); track card) {
+					<li class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
+						<span>{{ card.count }}&emsp;{{ card.name }}</span>
+						@if (group !== 'Sideboard') {
+						<span class="status-circle"
+							[ngClass]="cardExistsOnSide(card.name, 'right') ? 'circle-green' : 'circle-yellow'">
+						</span>
+						}
+					</li>
+					}
+				</ul>
+			</div>
+			}
+			}
+		</div>
+	</div>
+
+	<!-- Floating card image -->
+	@if (hoveredCardImage) {
+	<img [src]="hoveredCardImage" class="card-preview" [style.left.px]="hoverCardPosition.x"
+		[style.top.px]="hoverCardPosition.y" />
+	}
 </div>

@@ -2,6 +2,7 @@ import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { catchError, forkJoin, map, of } from 'rxjs';
 
 interface GroupedCards {
 	[type: string]: { name: string; count: number }[];
@@ -17,6 +18,8 @@ interface GroupedCards {
 export class DeckCompareComponent {
 	leftDeckText: string = '';
 	rightDeckText: string = '';
+	leftDeckUrl: string = '';
+	rightDeckUrl: string = '';
 
 	leftGroupedCards: GroupedCards = {};
 	rightGroupedCards: GroupedCards = {};
@@ -27,6 +30,16 @@ export class DeckCompareComponent {
 
 	// Toggle for showing only differences
 	showDifferencesOnly = false;
+
+	// Loading/error states
+	leftLoading = false;
+	rightLoading = false;
+	leftError = '';
+	rightError = '';
+
+	// Tab states
+	leftUseUrl = true;
+	rightUseUrl = true;
 
 	constructor(private http: HttpClient) { }
 
@@ -72,6 +85,112 @@ export class DeckCompareComponent {
 		this.hoveredCardImage = null;
 	}
 
+	importFromUrl(url: string, side: 'left' | 'right') {
+		if (!url.trim()) {
+			this.setError(side, 'Please enter a valid URL');
+			return;
+		}
+
+		const moxfieldMatch = url.match(/moxfield\.com\//);
+		const archidektMatch = url.match(/archidekt\.com\/decks\/(\d+)/);
+
+		if (moxfieldMatch) {
+			this.setError(
+				side,
+				'Moxfield URL import is currently unavailable because Moxfield blocks automated requests. Paste the Moxfield export in the decklist tab instead.'
+			);
+		} else if (archidektMatch) {
+			this.importFromArchidekt(archidektMatch[1], side);
+		} else {
+			this.setError(side, 'Invalid URL. Use an Archidekt deck URL, or paste a decklist export.');
+		}
+	}
+
+	private importFromArchidekt(deckId: string, side: 'left' | 'right') {
+		if (side === 'left') this.leftLoading = true;
+		else this.rightLoading = true;
+		this.setError(side, '');
+
+		const params = new URLSearchParams();
+		params.append('source', 'archidekt');
+		params.append('id', deckId);
+
+		const proxyUrl = `http://localhost:3001/api/deck?${params.toString()}`;
+
+		this.http.get<any>(proxyUrl).subscribe({
+			next: (data) => {
+				const cards: { [name: string]: number } = {};
+				const sideboard: { [name: string]: number } = {};
+				let commander: string | null = null;
+
+				if (data.cards) {
+					data.cards.forEach((cardObj: any) => {
+						if (this.isArchidektAuxiliaryCard(cardObj)) {
+							return;
+						}
+
+						const cardName = cardObj.card.oracleCard.name;
+						const quantity = cardObj.quantity || 1;
+						const categories = cardObj.categories || [];
+						const isCommander = categories.some((category: string) => /^commander$/i.test(category));
+						const isSideboard = categories.some((category: string) => /^(sideboard|maybeboard)$/i.test(category));
+
+						if (isCommander) {
+							commander = cardName;
+						} else if (isSideboard) {
+							sideboard[cardName] = (sideboard[cardName] || 0) + quantity;
+						} else {
+							cards[cardName] = (cards[cardName] || 0) + quantity;
+						}
+					});
+				}
+
+				this.processParsedDeck(cards, commander, Object.keys(sideboard).length ? sideboard : null, side);
+			},
+			error: (err) => {
+				this.setError(side, 'Failed to load deck from Archidekt. Make sure the proxy server is running on port 3001 (npm run proxy) and the URL is correct.');
+				if (side === 'left') this.leftLoading = false;
+				else this.rightLoading = false;
+			},
+		});
+	}
+
+	private isArchidektAuxiliaryCard(cardObj: any): boolean {
+		const oracleCard = cardObj?.card?.oracleCard;
+		const layout = String(oracleCard?.layout || '').toLowerCase();
+		const categories = Array.isArray(cardObj?.categories)
+			? cardObj.categories.map((category: string) => category.toLowerCase())
+			: [];
+
+		return ['token', 'double_faced_token', 'emblem', 'art_series'].includes(layout)
+			|| categories.includes('tokens & extras');
+	}
+
+	private processParsedDeck(
+		cards: { [name: string]: number },
+		commander: string | null,
+		sideboard: { [name: string]: number } | null,
+		side: 'left' | 'right'
+	) {
+		const grouped: GroupedCards = {};
+		const counts = cards;
+
+		this.addCardsFromCounts(counts, grouped, side);
+
+		if (sideboard) {
+			this.addCardsFromCounts(sideboard, grouped, side, 'Sideboard');
+		}
+
+		if (commander) {
+			if (!grouped['Commander']) grouped['Commander'] = [];
+			grouped['Commander'].push({ name: commander, count: 1 });
+			this.updateGroupedCards(side, grouped);
+		}
+
+		if (side === 'left') this.leftLoading = false;
+		else this.rightLoading = false;
+	}
+
 	processDecklist(rawList: string, side: 'left' | 'right') {
 		const allLines = rawList
 			.split('\n')
@@ -90,43 +209,123 @@ export class DeckCompareComponent {
 	}
 
 	private processMoxfieldDeck(allLines: string[], side: 'left' | 'right') {
+		const commanderSectionIndex = allLines.findIndex((line) => /^commander:?$/i.test(line));
 		const sideboardIndex = allLines.findIndex((line) => /^sideboard:?$/i.test(line));
-		const grouped: GroupedCards = {};
+
+		if (commanderSectionIndex !== -1) {
+			const mainDeckLines = allLines.slice(0, commanderSectionIndex);
+			const commanderLines = allLines.slice(commanderSectionIndex + 1, sideboardIndex === -1 ? undefined : sideboardIndex);
+			const commanderLine = commanderLines.find((line) => this.isDeckEntry(line)) || null;
+			const sideboardLines = sideboardIndex === -1 ? [] : allLines.slice(sideboardIndex + 1);
+			this.buildGroupedDeck(mainDeckLines, sideboardLines, commanderLine, side);
+			return;
+		}
 
 		if (sideboardIndex !== -1) {
 			const mainDeckLines = allLines.slice(0, sideboardIndex);
-			const sideboardPlusCommanderLines = allLines.slice(sideboardIndex + 1);
-			const commanderLine = sideboardPlusCommanderLines.pop() || null;
-			const sideboardLines = sideboardPlusCommanderLines;
+			const trailingLines = allLines.slice(sideboardIndex + 1);
+			const trailingCommanderCandidate = trailingLines.length > 0 ? trailingLines[trailingLines.length - 1] : null;
+			const sideboardLines = trailingCommanderCandidate ? trailingLines.slice(0, -1) : trailingLines;
 
-			const mainCounts = this.parseCardCounts(mainDeckLines);
-			const sideboardCounts = this.parseCardCounts(sideboardLines);
+			if (trailingCommanderCandidate) {
+				this.getCommanderLikelihood(this.cleanCardLine(trailingCommanderCandidate)).subscribe((isCommander) => {
+					const commanderLine = isCommander ? trailingCommanderCandidate : null;
+					const normalizedSideboard = isCommander ? sideboardLines : trailingLines;
+					if (commanderLine) {
+						this.buildGroupedDeck(mainDeckLines, normalizedSideboard, commanderLine, side);
+						return;
+					}
 
-			this.addCardsFromCounts(mainCounts, grouped, side);
-			this.addCardsFromCounts(sideboardCounts, grouped, side, 'Sideboard');
-
-			if (commanderLine) {
-				const cleanCommanderName = commanderLine.replace(/^(\d+)x?\s+/i, '').trim();
-				if (!grouped['Commander']) grouped['Commander'] = [];
-				grouped['Commander'].push({ name: cleanCommanderName, count: 1 });
+					this.resolveBoundaryCommander(mainDeckLines, normalizedSideboard, side);
+				});
+				return;
 			}
 
-			this.updateGroupedCards(side, grouped);
-		} else {
-			const mainDeckLines = [...allLines];
-			const commanderLine = mainDeckLines.pop() || null;
-
-			const mainCounts = this.parseCardCounts(mainDeckLines);
-			this.addCardsFromCounts(mainCounts, grouped, side);
-
-			if (commanderLine) {
-				const cleanCommanderName = commanderLine.replace(/^(\d+)x?\s+/i, '').trim();
-				if (!grouped['Commander']) grouped['Commander'] = [];
-				grouped['Commander'].push({ name: cleanCommanderName, count: 1 });
-			}
-
-			this.updateGroupedCards(side, grouped);
+			this.resolveBoundaryCommander(mainDeckLines, sideboardLines, side);
+			return;
 		}
+
+		this.resolveBoundaryCommander([...allLines], [], side);
+	}
+
+	private resolveBoundaryCommander(mainDeckLines: string[], sideboardLines: string[], side: 'left' | 'right') {
+		if (mainDeckLines.length === 0) {
+			this.buildGroupedDeck(mainDeckLines, sideboardLines, null, side);
+			return;
+		}
+
+		const firstLine = mainDeckLines[0];
+		const lastLine = mainDeckLines[mainDeckLines.length - 1];
+		const firstCardName = this.cleanCardLine(firstLine);
+		const lastCardName = this.cleanCardLine(lastLine);
+
+		forkJoin({
+			first: this.getCommanderLikelihood(firstCardName),
+			last: this.getCommanderLikelihood(lastCardName),
+		}).subscribe(({ first, last }) => {
+			let commanderLine: string | null = null;
+			const normalizedMainDeck = [...mainDeckLines];
+
+			if (first && !last) {
+				commanderLine = normalizedMainDeck.shift() || null;
+			} else if (last) {
+				commanderLine = normalizedMainDeck.pop() || null;
+			}
+
+			this.buildGroupedDeck(normalizedMainDeck, sideboardLines, commanderLine, side);
+		});
+	}
+
+	private buildGroupedDeck(
+		mainDeckLines: string[],
+		sideboardLines: string[],
+		commanderLine: string | null,
+		side: 'left' | 'right'
+	) {
+		const grouped: GroupedCards = {};
+		const mainCounts = this.parseCardCounts(mainDeckLines);
+		const sideboardCounts = this.parseCardCounts(sideboardLines);
+
+		if (commanderLine) {
+			const cleanCommanderName = this.cleanCardLine(commanderLine);
+			if (!grouped['Commander']) grouped['Commander'] = [];
+			grouped['Commander'].push({ name: cleanCommanderName, count: 1 });
+		}
+
+		this.addCardsFromCounts(mainCounts, grouped, side);
+		this.addCardsFromCounts(sideboardCounts, grouped, side, 'Sideboard');
+		this.updateGroupedCards(side, grouped);
+	}
+
+	private cleanCardLine(line: string): string {
+		return line.replace(/^(\d+)x?\s+/i, '').trim();
+	}
+
+	private isDeckEntry(line: string): boolean {
+		return /^(\d+)x?\s+.+$/i.test(line);
+	}
+
+	private getCommanderLikelihood(cardName: string) {
+		if (!cardName) {
+			return of(false);
+		}
+
+		return this.http
+			.get<any>(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(cardName)}`)
+			.pipe(
+				map((data) => {
+					const typeLine = data.type_line || data.card_faces?.[0]?.type_line || '';
+					const oracleText = [data.oracle_text, ...(data.card_faces?.map((face: any) => face.oracle_text) || [])]
+						.filter(Boolean)
+						.join(' ')
+						.toLowerCase();
+					const commanderLegality = data.legalities?.commander;
+					const isLegendaryLeader = /legendary/i.test(typeLine) && /(creature|planeswalker)/i.test(typeLine);
+					const hasCommanderText = /can be your commander|choose a background|doctor's companion|friends forever|partner/.test(oracleText);
+					return commanderLegality && commanderLegality !== 'not_legal' && (isLegendaryLeader || hasCommanderText);
+				}),
+				catchError(() => of(false))
+			);
 	}
 
 	private processArchidektDeck(allLines: string[], side: 'left' | 'right') {
@@ -278,6 +477,14 @@ export class DeckCompareComponent {
 			}
 		});
 		return sorted;
+	}
+
+	private setError(side: 'left' | 'right', message: string) {
+		if (side === 'left') {
+			this.leftError = message;
+		} else {
+			this.rightError = message;
+		}
 	}
 
 	getGroupKeys(side: 'left' | 'right'): string[] {
