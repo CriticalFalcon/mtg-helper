@@ -26,7 +26,11 @@
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
 	transform: scale(1.05);
 	color: var(--bs-secondary-color);
-	transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.3s ease, color 0.3s ease;
+	transition:
+		background 0.25s ease,
+		box-shadow 0.25s ease,
+		transform 0.3s ease,
+		color 0.3s ease;
 }
 
 /* Active (dark mode on) */
@@ -50,7 +54,6 @@
 
 /* Softer, slower breathing glow for dark mode */
 @keyframes glowPulse {
-
 	0%,
 	100% {
 		box-shadow: 0 0 6px rgba(var(--bs-warning-rgb), 0.3);
@@ -63,7 +66,6 @@
 
 /* Light mode subtle pulse keyframes */
 @keyframes pulseLight {
-
 	0%,
 	100% {
 		box-shadow: 0 0 5px rgba(var(--bs-secondary-rgb), 0.15);

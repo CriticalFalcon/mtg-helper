@@ -99,8 +99,7 @@ export class DeckCompareComponent {
 
 	onCardHover(cardName: string) {
 		this.getScryfallCard(cardName).subscribe((data) => {
-			this.hoveredCardImage =
-				data?.image_uris?.normal || data?.card_faces?.[0]?.image_uris?.normal || null;
+			this.hoveredCardImage = data?.image_uris?.normal || data?.card_faces?.[0]?.image_uris?.normal || null;
 		});
 	}
 
@@ -168,15 +167,23 @@ export class DeckCompareComponent {
 				this.processParsedDeck(cards, commander, Object.keys(sideboard).length ? sideboard : null, side);
 			},
 			error: () => {
-				this.setError(side, 'Failed to load deck from Moxfield. Make sure the deck is public and the URL is correct.');
+				this.setError(
+					side,
+					'Failed to load deck from Moxfield. Make sure the deck is public and the URL is correct.'
+				);
 				if (side === 'left') this.leftLoading = false;
 				else this.rightLoading = false;
 			},
 		});
 	}
 
-	private extractMoxfieldBoards(data: any): Array<{ kind: 'main' | 'commander' | 'sideboard' | 'tokens'; cards: Array<{ name: string; count: number }> }> {
-		const boards: Array<{ kind: 'main' | 'commander' | 'sideboard' | 'tokens'; cards: Array<{ name: string; count: number }> }> = [];
+	private extractMoxfieldBoards(
+		data: any
+	): Array<{ kind: 'main' | 'commander' | 'sideboard' | 'tokens'; cards: Array<{ name: string; count: number }> }> {
+		const boards: Array<{
+			kind: 'main' | 'commander' | 'sideboard' | 'tokens';
+			cards: Array<{ name: string; count: number }>;
+		}> = [];
 		const sourceBoards = data?.boards && typeof data.boards === 'object' ? data.boards : null;
 
 		if (sourceBoards) {
@@ -272,7 +279,9 @@ export class DeckCompareComponent {
 						const quantity = cardObj.quantity || 1;
 						const categories = cardObj.categories || [];
 						const isCommander = categories.some((category: string) => /^commander$/i.test(category));
-						const isSideboard = categories.some((category: string) => /^(sideboard|maybeboard)$/i.test(category));
+						const isSideboard = categories.some((category: string) =>
+							/^(sideboard|maybeboard)$/i.test(category)
+						);
 
 						if (isCommander) {
 							commander = cardName;
@@ -287,7 +296,10 @@ export class DeckCompareComponent {
 				this.processParsedDeck(cards, commander, Object.keys(sideboard).length ? sideboard : null, side);
 			},
 			error: (err) => {
-				this.setError(side, 'Failed to load deck from Archidekt. Make sure the deck is public and the URL is correct.');
+				this.setError(
+					side,
+					'Failed to load deck from Archidekt. Make sure the deck is public and the URL is correct.'
+				);
 				if (side === 'left') this.leftLoading = false;
 				else this.rightLoading = false;
 			},
@@ -301,8 +313,10 @@ export class DeckCompareComponent {
 			? cardObj.categories.map((category: string) => category.toLowerCase())
 			: [];
 
-		return ['token', 'double_faced_token', 'emblem', 'art_series'].includes(layout)
-			|| categories.includes('tokens & extras');
+		return (
+			['token', 'double_faced_token', 'emblem', 'art_series'].includes(layout) ||
+			categories.includes('tokens & extras')
+		);
 	}
 
 	private processParsedDeck(
@@ -353,7 +367,10 @@ export class DeckCompareComponent {
 
 		if (commanderSectionIndex !== -1) {
 			const mainDeckLines = allLines.slice(0, commanderSectionIndex);
-			const commanderLines = allLines.slice(commanderSectionIndex + 1, sideboardIndex === -1 ? undefined : sideboardIndex);
+			const commanderLines = allLines.slice(
+				commanderSectionIndex + 1,
+				sideboardIndex === -1 ? undefined : sideboardIndex
+			);
 			const commanderLine = commanderLines.find((line) => this.isDeckEntry(line)) || null;
 			const sideboardLines = sideboardIndex === -1 ? [] : allLines.slice(sideboardIndex + 1);
 			this.buildGroupedDeck(mainDeckLines, sideboardLines, commanderLine, side);
@@ -363,7 +380,8 @@ export class DeckCompareComponent {
 		if (sideboardIndex !== -1) {
 			const mainDeckLines = allLines.slice(0, sideboardIndex);
 			const trailingLines = allLines.slice(sideboardIndex + 1);
-			const trailingCommanderCandidate = trailingLines.length > 0 ? trailingLines[trailingLines.length - 1] : null;
+			const trailingCommanderCandidate =
+				trailingLines.length > 0 ? trailingLines[trailingLines.length - 1] : null;
 			const sideboardLines = trailingCommanderCandidate ? trailingLines.slice(0, -1) : trailingLines;
 
 			if (trailingCommanderCandidate) {
@@ -449,24 +467,28 @@ export class DeckCompareComponent {
 			return of(false);
 		}
 
-		return this.getScryfallCard(cardName)
-			.pipe(
-				map((data) => {
-					if (!data) {
-						return false;
-					}
+		return this.getScryfallCard(cardName).pipe(
+			map((data) => {
+				if (!data) {
+					return false;
+				}
 
-					const typeLine = data.type_line || data.card_faces?.[0]?.type_line || '';
-					const oracleText = [data.oracle_text, ...(data.card_faces?.map((face: any) => face.oracle_text) || [])]
-						.filter(Boolean)
-						.join(' ')
-						.toLowerCase();
-					const commanderLegality = data.legalities?.commander;
-					const isLegendaryLeader = /legendary/i.test(typeLine) && /(creature|planeswalker)/i.test(typeLine);
-					const hasCommanderText = /can be your commander|choose a background|doctor's companion|friends forever|partner/.test(oracleText);
-					return commanderLegality && commanderLegality !== 'not_legal' && (isLegendaryLeader || hasCommanderText);
-				})
-			);
+				const typeLine = data.type_line || data.card_faces?.[0]?.type_line || '';
+				const oracleText = [data.oracle_text, ...(data.card_faces?.map((face: any) => face.oracle_text) || [])]
+					.filter(Boolean)
+					.join(' ')
+					.toLowerCase();
+				const commanderLegality = data.legalities?.commander;
+				const isLegendaryLeader = /legendary/i.test(typeLine) && /(creature|planeswalker)/i.test(typeLine);
+				const hasCommanderText =
+					/can be your commander|choose a background|doctor's companion|friends forever|partner/.test(
+						oracleText
+					);
+				return (
+					commanderLegality && commanderLegality !== 'not_legal' && (isLegendaryLeader || hasCommanderText)
+				);
+			})
+		);
 	}
 
 	private processArchidektDeck(allLines: string[], side: 'left' | 'right') {
@@ -746,6 +768,4 @@ export class DeckCompareComponent {
 	getFilteredGroupCount(cards: { name: string; count: number }[], side: 'left' | 'right'): number {
 		return this.filterDifferentCards(cards, side).reduce((acc, c) => acc + c.count, 0);
 	}
-
 }
-

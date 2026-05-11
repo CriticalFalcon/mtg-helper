@@ -5,47 +5,79 @@
 			<div class="mb-4">
 				<!-- Tabs -->
 				<div class="btn-group mb-3" role="tablist">
-					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="leftUseUrl"
-						(click)="leftUseUrl = true">Import from URL</button>
-					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="!leftUseUrl"
-						(click)="leftUseUrl = false">Paste Decklist</button>
+					<button
+						type="button"
+						class="btn btn-outline-secondary btn-sm"
+						[class.active]="leftUseUrl"
+						(click)="leftUseUrl = true"
+					>
+						Import from URL
+					</button>
+					<button
+						type="button"
+						class="btn btn-outline-secondary btn-sm"
+						[class.active]="!leftUseUrl"
+						(click)="leftUseUrl = false"
+					>
+						Paste Decklist
+					</button>
 				</div>
 
 				<!-- URL Input -->
 				@if (leftUseUrl) {
-				<div>
-					<label for="leftDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
-					<input type="text" id="leftDeckUrl" [(ngModel)]="leftDeckUrl" class="form-control mb-2"
-						placeholder="Paste a Moxfield or Archidekt deck URL">
-					<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
-					<button class="btn btn-primary mt-2 btn-sm rounded-pill"
-						(click)="importFromUrl(leftDeckUrl, 'left')" [disabled]="leftLoading">
-						@if (leftLoading) {
-						<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-						Loading...
-						} @else {
-						Import Deck 1
+					<div>
+						<label for="leftDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
+						<input
+							type="text"
+							id="leftDeckUrl"
+							[(ngModel)]="leftDeckUrl"
+							class="form-control mb-2"
+							placeholder="Paste a Moxfield or Archidekt deck URL"
+						/>
+						<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
+						<button
+							class="btn btn-primary mt-2 btn-sm rounded-pill"
+							(click)="importFromUrl(leftDeckUrl, 'left')"
+							[disabled]="leftLoading"
+						>
+							@if (leftLoading) {
+								<span
+									class="spinner-border spinner-border-sm me-2"
+									role="status"
+									aria-hidden="true"
+								></span>
+								Loading...
+							} @else {
+								Import Deck 1
+							}
+						</button>
+						@if (leftError) {
+							<div class="alert alert-danger mt-2 mb-0 py-2">{{ leftError }}</div>
 						}
-					</button>
-					@if (leftError) {
-					<div class="alert alert-danger mt-2 mb-0 py-2">{{ leftError }}</div>
-					}
-				</div>
+					</div>
 				}
 
 				<!-- Paste Decklist -->
 				@if (!leftUseUrl) {
-				<div>
-					<label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
-					<textarea id="leftRawDecklist" [(ngModel)]="leftDeckText" class="form-control expandable-textarea"
-						placeholder="Paste here" rows="6"></textarea>
-					<div class="form-text">Supports commander exports with the commander at either the top or the bottom
-						of the list.</div>
-					<button class="btn btn-primary mt-3 btn-sm rounded-pill"
-						(click)="processDecklist(leftDeckText, 'left')">
-						Import Deck 1
-					</button>
-				</div>
+					<div>
+						<label for="leftRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
+						<textarea
+							id="leftRawDecklist"
+							[(ngModel)]="leftDeckText"
+							class="form-control expandable-textarea"
+							placeholder="Paste here"
+							rows="6"
+						></textarea>
+						<div class="form-text">
+							Supports commander exports with the commander at either the top or the bottom of the list.
+						</div>
+						<button
+							class="btn btn-primary mt-3 btn-sm rounded-pill"
+							(click)="processDecklist(leftDeckText, 'left')"
+						>
+							Import Deck 1
+						</button>
+					</div>
 				}
 			</div>
 		</div>
@@ -55,47 +87,79 @@
 			<div class="mb-4">
 				<!-- Tabs -->
 				<div class="btn-group mb-3" role="tablist">
-					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="rightUseUrl"
-						(click)="rightUseUrl = true">Import from URL</button>
-					<button type="button" class="btn btn-outline-secondary btn-sm" [class.active]="!rightUseUrl"
-						(click)="rightUseUrl = false">Paste Decklist</button>
+					<button
+						type="button"
+						class="btn btn-outline-secondary btn-sm"
+						[class.active]="rightUseUrl"
+						(click)="rightUseUrl = true"
+					>
+						Import from URL
+					</button>
+					<button
+						type="button"
+						class="btn btn-outline-secondary btn-sm"
+						[class.active]="!rightUseUrl"
+						(click)="rightUseUrl = false"
+					>
+						Paste Decklist
+					</button>
 				</div>
 
 				<!-- URL Input -->
 				@if (rightUseUrl) {
-				<div>
-					<label for="rightDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
-					<input type="text" id="rightDeckUrl" [(ngModel)]="rightDeckUrl" class="form-control mb-2"
-						placeholder="Paste a Moxfield or Archidekt deck URL">
-					<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
-					<button class="btn btn-primary mt-2 btn-sm rounded-pill"
-						(click)="importFromUrl(rightDeckUrl, 'right')" [disabled]="rightLoading">
-						@if (rightLoading) {
-						<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-						Loading...
-						} @else {
-						Import Deck 2
+					<div>
+						<label for="rightDeckUrl" class="form-label fw-semibold small-label">Deck URL</label>
+						<input
+							type="text"
+							id="rightDeckUrl"
+							[(ngModel)]="rightDeckUrl"
+							class="form-control mb-2"
+							placeholder="Paste a Moxfield or Archidekt deck URL"
+						/>
+						<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
+						<button
+							class="btn btn-primary mt-2 btn-sm rounded-pill"
+							(click)="importFromUrl(rightDeckUrl, 'right')"
+							[disabled]="rightLoading"
+						>
+							@if (rightLoading) {
+								<span
+									class="spinner-border spinner-border-sm me-2"
+									role="status"
+									aria-hidden="true"
+								></span>
+								Loading...
+							} @else {
+								Import Deck 2
+							}
+						</button>
+						@if (rightError) {
+							<div class="alert alert-danger mt-2 mb-0 py-2">{{ rightError }}</div>
 						}
-					</button>
-					@if (rightError) {
-					<div class="alert alert-danger mt-2 mb-0 py-2">{{ rightError }}</div>
-					}
-				</div>
+					</div>
 				}
 
 				<!-- Paste Decklist -->
 				@if (!rightUseUrl) {
-				<div>
-					<label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
-					<textarea id="rightRawDecklist" [(ngModel)]="rightDeckText" class="form-control expandable-textarea"
-						placeholder="Paste here" rows="6"></textarea>
-					<div class="form-text">Supports commander exports with the commander at either the top or the bottom
-						of the list.</div>
-					<button class="btn btn-primary mt-3 btn-sm rounded-pill"
-						(click)="processDecklist(rightDeckText, 'right')">
-						Import Deck 2
-					</button>
-				</div>
+					<div>
+						<label for="rightRawDecklist" class="form-label fw-semibold small-label">MTGO Decklist</label>
+						<textarea
+							id="rightRawDecklist"
+							[(ngModel)]="rightDeckText"
+							class="form-control expandable-textarea"
+							placeholder="Paste here"
+							rows="6"
+						></textarea>
+						<div class="form-text">
+							Supports commander exports with the commander at either the top or the bottom of the list.
+						</div>
+						<button
+							class="btn btn-primary mt-3 btn-sm rounded-pill"
+							(click)="processDecklist(rightDeckText, 'right')"
+						>
+							Import Deck 2
+						</button>
+					</div>
 				}
 			</div>
 		</div>
@@ -103,9 +167,14 @@
 
 	<!-- Toggle Button Centered Below Inputs -->
 	<div class="d-flex justify-content-center my-3">
-		<button type="button" class="btn btn-outline-primary rounded-pill" [class.active]="showDifferencesOnly"
-			(click)="toggleShowDifferences()" [attr.aria-pressed]="showDifferencesOnly"
-			title="Show only cards that differ between decks">
+		<button
+			type="button"
+			class="btn btn-outline-primary rounded-pill"
+			[class.active]="showDifferencesOnly"
+			(click)="toggleShowDifferences()"
+			[attr.aria-pressed]="showDifferencesOnly"
+			title="Show only cards that differ between decks"
+		>
 			Show Differences
 		</button>
 	</div>
@@ -119,95 +188,151 @@
 
 		<div class="d-none d-md-block">
 			@for (group of getComparisonGroupKeys(); track group) {
-			<div class="comparison-group-row">
-				<div class="comparison-group-column">
-					<div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
-						[class.group-empty]="!hasGroupCards('left', group)" class="group-container mt-3">
-						<div class="group-header" [class.group-header-clickable]="group === 'Sideboard'"
-							(click)="group === 'Sideboard' && toggleSideboardVisibility('left')"
-							(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('left')"
-							(keydown.space)="group === 'Sideboard' && toggleSideboardVisibility('left'); $event.preventDefault()"
-							[attr.role]="group === 'Sideboard' ? 'button' : null"
-							[attr.tabindex]="group === 'Sideboard' ? 0 : null"
-							[attr.aria-expanded]="group === 'Sideboard' ? leftSideboardExpanded : null"
-							[attr.aria-label]="group === 'Sideboard' ? (leftSideboardExpanded ? 'Hide left side sideboard cards' : 'Show left side sideboard cards') : null">
-							<span class="group-header-title">{{ group }}</span>
-							<span class="group-header-actions">
-								<span class="badge text-bg-primary rounded-pill">{{ getGroupCount('left', group)
-									}}</span>
-								@if (group === 'Sideboard') {
-								<i class="sideboard-toggle-icon bi text-secondary"
-									[ngClass]="leftSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
-									aria-hidden="true"></i>
-								}
-							</span>
-						</div>
-						@if (hasGroupCards('left', group) && isGroupExpanded('left', group)) {
-						<ul class="card-list">
-							@for (card of getVisibleCardsForGroup('left', group); track card) {
-							<li class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-								<span>{{ card.count }}&emsp;{{ card.name }}</span>
-								@if (group !== 'Sideboard') {
-								<span class="status-circle"
-									[ngClass]="cardExistsOnSide(card.name, 'left') ? 'bg-success' : 'bg-warning'">
+				<div class="comparison-group-row">
+					<div class="comparison-group-column">
+						<div
+							[class.commander]="group === 'Commander'"
+							[class.sideboard]="group === 'Sideboard'"
+							[class.group-empty]="!hasGroupCards('left', group)"
+							class="group-container mt-3"
+						>
+							<div
+								class="group-header"
+								[class.group-header-clickable]="group === 'Sideboard'"
+								(click)="group === 'Sideboard' && toggleSideboardVisibility('left')"
+								(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('left')"
+								(keydown.space)="
+									group === 'Sideboard' && toggleSideboardVisibility('left'); $event.preventDefault()
+								"
+								[attr.role]="group === 'Sideboard' ? 'button' : null"
+								[attr.tabindex]="group === 'Sideboard' ? 0 : null"
+								[attr.aria-expanded]="group === 'Sideboard' ? leftSideboardExpanded : null"
+								[attr.aria-label]="
+									group === 'Sideboard'
+										? leftSideboardExpanded
+											? 'Hide left side sideboard cards'
+											: 'Show left side sideboard cards'
+										: null
+								"
+							>
+								<span class="group-header-title">{{ group }}</span>
+								<span class="group-header-actions">
+									<span class="badge text-bg-primary rounded-pill">
+										{{ getGroupCount('left', group) }}
+									</span>
+									@if (group === 'Sideboard') {
+										<i
+											class="sideboard-toggle-icon bi text-secondary"
+											[ngClass]="leftSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
+											aria-hidden="true"
+										></i>
+									}
 								</span>
-								}
-							</li>
+							</div>
+							@if (hasGroupCards('left', group) && isGroupExpanded('left', group)) {
+								<ul class="card-list">
+									@for (card of getVisibleCardsForGroup('left', group); track card) {
+										<li
+											class="card-item"
+											(mouseenter)="onCardHover(card.name)"
+											(mouseleave)="onCardLeave()"
+										>
+											<span>{{ card.count }}&emsp;{{ card.name }}</span>
+											@if (group !== 'Sideboard') {
+												<span
+													class="status-circle"
+													[ngClass]="
+														cardExistsOnSide(card.name, 'left')
+															? 'bg-success'
+															: 'bg-warning'
+													"
+												></span>
+											}
+										</li>
+									}
+								</ul>
+							} @else if (hasGroupCards('left', group) && group === 'Sideboard') {
+								<div class="group-collapsed-state text-secondary">
+									Sideboard hidden. Click the header to expand.
+								</div>
+							} @else {
+								<div class="group-empty-state text-secondary">No cards in this category.</div>
 							}
-						</ul>
-						} @else if (hasGroupCards('left', group) && group === 'Sideboard') {
-						<div class="group-collapsed-state text-secondary">Sideboard hidden. Click the header to expand.
 						</div>
-						} @else {
-						<div class="group-empty-state text-secondary">No cards in this category.</div>
-						}
 					</div>
-				</div>
 
-				<div class="comparison-group-column">
-					<div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
-						[class.group-empty]="!hasGroupCards('right', group)" class="group-container mt-3">
-						<div class="group-header" [class.group-header-clickable]="group === 'Sideboard'"
-							(click)="group === 'Sideboard' && toggleSideboardVisibility('right')"
-							(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('right')"
-							(keydown.space)="group === 'Sideboard' && toggleSideboardVisibility('right'); $event.preventDefault()"
-							[attr.role]="group === 'Sideboard' ? 'button' : null"
-							[attr.tabindex]="group === 'Sideboard' ? 0 : null"
-							[attr.aria-expanded]="group === 'Sideboard' ? rightSideboardExpanded : null"
-							[attr.aria-label]="group === 'Sideboard' ? (rightSideboardExpanded ? 'Hide right side sideboard cards' : 'Show right side sideboard cards') : null">
-							<span class="group-header-title">{{ group }}</span>
-							<span class="group-header-actions">
-								<span class="badge text-bg-primary rounded-pill">{{ getGroupCount('right', group)
-									}}</span>
-								@if (group === 'Sideboard') {
-								<i class="sideboard-toggle-icon bi text-secondary"
-									[ngClass]="rightSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
-									aria-hidden="true"></i>
-								}
-							</span>
-						</div>
-						@if (hasGroupCards('right', group) && isGroupExpanded('right', group)) {
-						<ul class="card-list">
-							@for (card of getVisibleCardsForGroup('right', group); track card) {
-							<li class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-								<span>{{ card.count }}&emsp;{{ card.name }}</span>
-								@if (group !== 'Sideboard') {
-								<span class="status-circle"
-									[ngClass]="cardExistsOnSide(card.name, 'right') ? 'bg-success' : 'bg-warning'">
+					<div class="comparison-group-column">
+						<div
+							[class.commander]="group === 'Commander'"
+							[class.sideboard]="group === 'Sideboard'"
+							[class.group-empty]="!hasGroupCards('right', group)"
+							class="group-container mt-3"
+						>
+							<div
+								class="group-header"
+								[class.group-header-clickable]="group === 'Sideboard'"
+								(click)="group === 'Sideboard' && toggleSideboardVisibility('right')"
+								(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('right')"
+								(keydown.space)="
+									group === 'Sideboard' && toggleSideboardVisibility('right'); $event.preventDefault()
+								"
+								[attr.role]="group === 'Sideboard' ? 'button' : null"
+								[attr.tabindex]="group === 'Sideboard' ? 0 : null"
+								[attr.aria-expanded]="group === 'Sideboard' ? rightSideboardExpanded : null"
+								[attr.aria-label]="
+									group === 'Sideboard'
+										? rightSideboardExpanded
+											? 'Hide right side sideboard cards'
+											: 'Show right side sideboard cards'
+										: null
+								"
+							>
+								<span class="group-header-title">{{ group }}</span>
+								<span class="group-header-actions">
+									<span class="badge text-bg-primary rounded-pill">
+										{{ getGroupCount('right', group) }}
+									</span>
+									@if (group === 'Sideboard') {
+										<i
+											class="sideboard-toggle-icon bi text-secondary"
+											[ngClass]="rightSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
+											aria-hidden="true"
+										></i>
+									}
 								</span>
-								}
-							</li>
+							</div>
+							@if (hasGroupCards('right', group) && isGroupExpanded('right', group)) {
+								<ul class="card-list">
+									@for (card of getVisibleCardsForGroup('right', group); track card) {
+										<li
+											class="card-item"
+											(mouseenter)="onCardHover(card.name)"
+											(mouseleave)="onCardLeave()"
+										>
+											<span>{{ card.count }}&emsp;{{ card.name }}</span>
+											@if (group !== 'Sideboard') {
+												<span
+													class="status-circle"
+													[ngClass]="
+														cardExistsOnSide(card.name, 'right')
+															? 'bg-success'
+															: 'bg-warning'
+													"
+												></span>
+											}
+										</li>
+									}
+								</ul>
+							} @else if (hasGroupCards('right', group) && group === 'Sideboard') {
+								<div class="group-collapsed-state text-secondary">
+									Sideboard hidden. Click the header to expand.
+								</div>
+							} @else {
+								<div class="group-empty-state text-secondary">No cards in this category.</div>
 							}
-						</ul>
-						} @else if (hasGroupCards('right', group) && group === 'Sideboard') {
-						<div class="group-collapsed-state text-secondary">Sideboard hidden. Click the header to expand.
 						</div>
-						} @else {
-						<div class="group-empty-state text-secondary">No cards in this category.</div>
-						}
 					</div>
 				</div>
-			</div>
 			}
 		</div>
 
@@ -215,92 +340,146 @@
 			<div class="comparison-mobile-deck">
 				<h5 class="deck-header text-center mb-0">{{ leftDeckTitle }}</h5>
 				@for (group of getComparisonGroupKeys(); track group) {
-				<div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
-					[class.group-empty]="!hasGroupCards('left', group)" class="group-container mt-3">
-					<div class="group-header" [class.group-header-clickable]="group === 'Sideboard'"
-						(click)="group === 'Sideboard' && toggleSideboardVisibility('left')"
-						(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('left')"
-						(keydown.space)="group === 'Sideboard' && toggleSideboardVisibility('left'); $event.preventDefault()"
-						[attr.role]="group === 'Sideboard' ? 'button' : null"
-						[attr.tabindex]="group === 'Sideboard' ? 0 : null"
-						[attr.aria-expanded]="group === 'Sideboard' ? leftSideboardExpanded : null"
-						[attr.aria-label]="group === 'Sideboard' ? (leftSideboardExpanded ? 'Hide left side sideboard cards' : 'Show left side sideboard cards') : null">
-						<span class="group-header-title">{{ group }}</span>
-						<span class="group-header-actions">
-							<span class="badge text-bg-primary rounded-pill">{{ getGroupCount('left', group) }}</span>
-							@if (group === 'Sideboard') {
-							<i class="sideboard-toggle-icon bi text-secondary"
-								[ngClass]="leftSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
-								aria-hidden="true"></i>
-							}
-						</span>
-					</div>
-					@if (hasGroupCards('left', group) && isGroupExpanded('left', group)) {
-					<ul class="card-list">
-						@for (card of getVisibleCardsForGroup('left', group); track card) {
-						<li class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-							<span>{{ card.count }}&emsp;{{ card.name }}</span>
-							@if (group !== 'Sideboard') {
-							<span class="status-circle"
-								[ngClass]="cardExistsOnSide(card.name, 'left') ? 'bg-success' : 'bg-warning'">
+					<div
+						[class.commander]="group === 'Commander'"
+						[class.sideboard]="group === 'Sideboard'"
+						[class.group-empty]="!hasGroupCards('left', group)"
+						class="group-container mt-3"
+					>
+						<div
+							class="group-header"
+							[class.group-header-clickable]="group === 'Sideboard'"
+							(click)="group === 'Sideboard' && toggleSideboardVisibility('left')"
+							(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('left')"
+							(keydown.space)="
+								group === 'Sideboard' && toggleSideboardVisibility('left'); $event.preventDefault()
+							"
+							[attr.role]="group === 'Sideboard' ? 'button' : null"
+							[attr.tabindex]="group === 'Sideboard' ? 0 : null"
+							[attr.aria-expanded]="group === 'Sideboard' ? leftSideboardExpanded : null"
+							[attr.aria-label]="
+								group === 'Sideboard'
+									? leftSideboardExpanded
+										? 'Hide left side sideboard cards'
+										: 'Show left side sideboard cards'
+									: null
+							"
+						>
+							<span class="group-header-title">{{ group }}</span>
+							<span class="group-header-actions">
+								<span class="badge text-bg-primary rounded-pill">
+									{{ getGroupCount('left', group) }}
+								</span>
+								@if (group === 'Sideboard') {
+									<i
+										class="sideboard-toggle-icon bi text-secondary"
+										[ngClass]="leftSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
+										aria-hidden="true"
+									></i>
+								}
 							</span>
-							}
-						</li>
+						</div>
+						@if (hasGroupCards('left', group) && isGroupExpanded('left', group)) {
+							<ul class="card-list">
+								@for (card of getVisibleCardsForGroup('left', group); track card) {
+									<li
+										class="card-item"
+										(mouseenter)="onCardHover(card.name)"
+										(mouseleave)="onCardLeave()"
+									>
+										<span>{{ card.count }}&emsp;{{ card.name }}</span>
+										@if (group !== 'Sideboard') {
+											<span
+												class="status-circle"
+												[ngClass]="
+													cardExistsOnSide(card.name, 'left') ? 'bg-success' : 'bg-warning'
+												"
+											></span>
+										}
+									</li>
+								}
+							</ul>
+						} @else if (hasGroupCards('left', group) && group === 'Sideboard') {
+							<div class="group-collapsed-state text-secondary">
+								Sideboard hidden. Click the header to expand.
+							</div>
+						} @else {
+							<div class="group-empty-state text-secondary">No cards in this category.</div>
 						}
-					</ul>
-					} @else if (hasGroupCards('left', group) && group === 'Sideboard') {
-					<div class="group-collapsed-state text-secondary">Sideboard hidden. Click the header to expand.
 					</div>
-					} @else {
-					<div class="group-empty-state text-secondary">No cards in this category.</div>
-					}
-				</div>
 				}
 			</div>
 
 			<div class="comparison-mobile-deck">
 				<h5 class="deck-header text-center mb-0">{{ rightDeckTitle }}</h5>
 				@for (group of getComparisonGroupKeys(); track group) {
-				<div [class.commander]="group === 'Commander'" [class.sideboard]="group === 'Sideboard'"
-					[class.group-empty]="!hasGroupCards('right', group)" class="group-container mt-3">
-					<div class="group-header" [class.group-header-clickable]="group === 'Sideboard'"
-						(click)="group === 'Sideboard' && toggleSideboardVisibility('right')"
-						(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('right')"
-						(keydown.space)="group === 'Sideboard' && toggleSideboardVisibility('right'); $event.preventDefault()"
-						[attr.role]="group === 'Sideboard' ? 'button' : null"
-						[attr.tabindex]="group === 'Sideboard' ? 0 : null"
-						[attr.aria-expanded]="group === 'Sideboard' ? rightSideboardExpanded : null"
-						[attr.aria-label]="group === 'Sideboard' ? (rightSideboardExpanded ? 'Hide right side sideboard cards' : 'Show right side sideboard cards') : null">
-						<span class="group-header-title">{{ group }}</span>
-						<span class="group-header-actions">
-							<span class="badge text-bg-primary rounded-pill">{{ getGroupCount('right', group) }}</span>
-							@if (group === 'Sideboard') {
-							<i class="sideboard-toggle-icon bi text-secondary"
-								[ngClass]="rightSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
-								aria-hidden="true"></i>
-							}
-						</span>
-					</div>
-					@if (hasGroupCards('right', group) && isGroupExpanded('right', group)) {
-					<ul class="card-list">
-						@for (card of getVisibleCardsForGroup('right', group); track card) {
-						<li class="card-item" (mouseenter)="onCardHover(card.name)" (mouseleave)="onCardLeave()">
-							<span>{{ card.count }}&emsp;{{ card.name }}</span>
-							@if (group !== 'Sideboard') {
-							<span class="status-circle"
-								[ngClass]="cardExistsOnSide(card.name, 'right') ? 'bg-success' : 'bg-warning'">
+					<div
+						[class.commander]="group === 'Commander'"
+						[class.sideboard]="group === 'Sideboard'"
+						[class.group-empty]="!hasGroupCards('right', group)"
+						class="group-container mt-3"
+					>
+						<div
+							class="group-header"
+							[class.group-header-clickable]="group === 'Sideboard'"
+							(click)="group === 'Sideboard' && toggleSideboardVisibility('right')"
+							(keydown.enter)="group === 'Sideboard' && toggleSideboardVisibility('right')"
+							(keydown.space)="
+								group === 'Sideboard' && toggleSideboardVisibility('right'); $event.preventDefault()
+							"
+							[attr.role]="group === 'Sideboard' ? 'button' : null"
+							[attr.tabindex]="group === 'Sideboard' ? 0 : null"
+							[attr.aria-expanded]="group === 'Sideboard' ? rightSideboardExpanded : null"
+							[attr.aria-label]="
+								group === 'Sideboard'
+									? rightSideboardExpanded
+										? 'Hide right side sideboard cards'
+										: 'Show right side sideboard cards'
+									: null
+							"
+						>
+							<span class="group-header-title">{{ group }}</span>
+							<span class="group-header-actions">
+								<span class="badge text-bg-primary rounded-pill">
+									{{ getGroupCount('right', group) }}
+								</span>
+								@if (group === 'Sideboard') {
+									<i
+										class="sideboard-toggle-icon bi text-secondary"
+										[ngClass]="rightSideboardExpanded ? 'bi-chevron-up' : 'bi-chevron-down'"
+										aria-hidden="true"
+									></i>
+								}
 							</span>
-							}
-						</li>
+						</div>
+						@if (hasGroupCards('right', group) && isGroupExpanded('right', group)) {
+							<ul class="card-list">
+								@for (card of getVisibleCardsForGroup('right', group); track card) {
+									<li
+										class="card-item"
+										(mouseenter)="onCardHover(card.name)"
+										(mouseleave)="onCardLeave()"
+									>
+										<span>{{ card.count }}&emsp;{{ card.name }}</span>
+										@if (group !== 'Sideboard') {
+											<span
+												class="status-circle"
+												[ngClass]="
+													cardExistsOnSide(card.name, 'right') ? 'bg-success' : 'bg-warning'
+												"
+											></span>
+										}
+									</li>
+								}
+							</ul>
+						} @else if (hasGroupCards('right', group) && group === 'Sideboard') {
+							<div class="group-collapsed-state text-secondary">
+								Sideboard hidden. Click the header to expand.
+							</div>
+						} @else {
+							<div class="group-empty-state text-secondary">No cards in this category.</div>
 						}
-					</ul>
-					} @else if (hasGroupCards('right', group) && group === 'Sideboard') {
-					<div class="group-collapsed-state text-secondary">Sideboard hidden. Click the header to expand.
 					</div>
-					} @else {
-					<div class="group-empty-state text-secondary">No cards in this category.</div>
-					}
-				</div>
 				}
 			</div>
 		</div>
@@ -308,7 +487,11 @@
 
 	<!-- Floating card image -->
 	@if (hoveredCardImage) {
-	<img [src]="hoveredCardImage" class="card-preview" [style.left.px]="hoverCardPosition.x"
-		[style.top.px]="hoverCardPosition.y" />
+		<img
+			[src]="hoveredCardImage"
+			class="card-preview"
+			[style.left.px]="hoverCardPosition.x"
+			[style.top.px]="hoverCardPosition.y"
+		/>
 	}
 </div>

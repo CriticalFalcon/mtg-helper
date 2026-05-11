@@ -115,7 +115,9 @@ body,
 .group-header-clickable {
 	cursor: pointer;
 	border-radius: 6px;
-	transition: background-color 0.2s ease, color 0.2s ease;
+	transition:
+		background-color 0.2s ease,
+		color 0.2s ease;
 }
 
 .group-header-clickable:hover {

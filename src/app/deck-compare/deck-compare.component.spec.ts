@@ -11,9 +11,8 @@ describe('DeckCompareComponent', () => {
 		localStorage.removeItem('mtg-helper:deck-compare:right-sideboard-expanded');
 
 		await TestBed.configureTestingModule({
-			imports: [DeckCompareComponent]
-		})
-			.compileComponents();
+			imports: [DeckCompareComponent],
+		}).compileComponents();
 
 		fixture = TestBed.createComponent(DeckCompareComponent);
 		component = fixture.componentInstance;

@@ -15,7 +15,6 @@
 	border-radius: 500px;
 }
 
-
 /* Deck headers */
 .deck-header {
 	font-weight: 600;
@@ -32,7 +31,6 @@
 }
 
 @media (max-width: 768px) {
-
 	/* Add a horizontal separator between stacked decks */
 	.deck-separator {
 		width: 100%;

@@ -10,7 +10,7 @@ import { Router, RouterModule } from '@angular/router';
 	standalone: true,
 	imports: [FormsModule, HighlightPipe, RouterModule],
 	templateUrl: './navbar.component.html',
-	styleUrls: ['./navbar.component.css']
+	styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent {
 	isDarkMode = false;
@@ -39,7 +39,11 @@ export class NavbarComponent {
 	showSuggestions: boolean = false;
 	activeIndex: number = -1;
 
-	constructor(private http: HttpClient, private elementRef: ElementRef, private router: Router) { }
+	constructor(
+		private http: HttpClient,
+		private elementRef: ElementRef,
+		private router: Router
+	) {}
 
 	onInputChange() {
 		this.userInput = this.searchTerm;
@@ -51,7 +55,8 @@ export class NavbarComponent {
 			return;
 		}
 
-		this.http.get<any>(`https://api.scryfall.com/cards/autocomplete?q=${encodeURIComponent(this.userInput)}`)
+		this.http
+			.get<any>(`https://api.scryfall.com/cards/autocomplete?q=${encodeURIComponent(this.userInput)}`)
 			.subscribe({
 				next: (data) => {
 					this.suggestions = (data.data || []).slice(0, 10);
@@ -60,7 +65,7 @@ export class NavbarComponent {
 				error: () => {
 					this.suggestions = [];
 					this.showSuggestions = false;
-				}
+				},
 			});
 	}
 
@@ -75,8 +80,7 @@ export class NavbarComponent {
 			}
 			this.updateSearchTermFromActiveIndex();
 			event.preventDefault();
-		}
-		else if (event.key === 'ArrowUp') {
+		} else if (event.key === 'ArrowUp') {
 			if (this.activeIndex === -1) {
 				this.activeIndex = this.suggestions.length - 1;
 			} else {
@@ -84,8 +88,7 @@ export class NavbarComponent {
 			}
 			this.updateSearchTermFromActiveIndex();
 			event.preventDefault();
-		}
-		else if (event.key === 'Enter') {
+		} else if (event.key === 'Enter') {
 			event.preventDefault();
 			if (this.activeIndex >= 0 && this.activeIndex < this.suggestions.length) {
 				this.selectSuggestion(this.suggestions[this.activeIndex]);

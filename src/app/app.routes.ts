@@ -8,5 +8,5 @@ export const routes: Routes = [
 	{ path: 'card', component: CardSearchComponent },
 	{ path: 'card/:name', component: CardSearchComponent },
 	{ path: 'compare', component: DeckCompareComponent },
-	{ path: '**', redirectTo: '' } // fallback
+	{ path: '**', redirectTo: '' }, // fallback
 ];
