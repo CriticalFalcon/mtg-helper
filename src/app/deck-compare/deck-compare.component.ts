@@ -126,8 +126,11 @@ export class DeckCompareComponent {
 	}
 
 	private importFromMoxfield(deckId: string, side: 'left' | 'right') {
-		if (side === 'left') this.leftLoading = true;
-		else this.rightLoading = true;
+		if (side === 'left') {
+			this.leftLoading = true;
+		} else {
+			this.rightLoading = true;
+		}
 		this.setError(side, '');
 
 		const moxfieldUrl = `https://api.proxxied.com/api/moxfield/decks/${encodeURIComponent(deckId)}`;
@@ -171,8 +174,11 @@ export class DeckCompareComponent {
 					side,
 					'Failed to load deck from Moxfield. Make sure the deck is public and the URL is correct.'
 				);
-				if (side === 'left') this.leftLoading = false;
-				else this.rightLoading = false;
+				if (side === 'left') {
+					this.leftLoading = false;
+				} else {
+					this.rightLoading = false;
+				}
 			},
 		});
 	}
