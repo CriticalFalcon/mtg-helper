@@ -7,7 +7,7 @@
 			<!-- Dark mode toggle visible only on small screens -->
 			<button
 				type="button"
-				class="btn dark-toggle-btn me-2"
+				class="btn btn-outline-secondary dark-toggle-btn me-2"
 				(click)="toggleDarkMode()"
 				[class.active]="isDarkMode"
 				[attr.aria-pressed]="isDarkMode"
@@ -42,7 +42,15 @@
 					<a class="nav-link" routerLink="/">Home</a>
 				</li>
 				<li class="nav-item">
+					<a class="nav-link" routerLink="/analyzer" routerLinkActive="active">Analyzer</a>
+				</li>
+				<li class="nav-item">
 					<a class="nav-link" routerLink="/compare" routerLinkActive="active">Compare</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" routerLink="/card" fragment="advanced-search" routerLinkActive="active">
+						Advanced Search
+					</a>
 				</li>
 			</ul>
 
@@ -78,7 +86,7 @@
 				<!-- Large screen toggle, visible only on lg+ -->
 				<button
 					type="button"
-					class="btn dark-toggle-btn d-none d-lg-flex"
+					class="btn btn-outline-secondary dark-toggle-btn d-none d-lg-flex"
 					(click)="toggleDarkMode()"
 					[class.active]="isDarkMode"
 					[attr.aria-pressed]="isDarkMode"

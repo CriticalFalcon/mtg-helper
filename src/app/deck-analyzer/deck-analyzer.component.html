@@ -1,0 +1,351 @@
+<div class="container analyzer-page mt-4 mb-5">
+	<section class="app-surface p-3 p-md-4 mb-4">
+		<div class="d-flex flex-wrap gap-3 align-items-end">
+			<div class="flex-grow-1">
+				<label class="form-label fw-semibold mb-1" for="analyzer-deck-name">Deck Name</label>
+				<input id="analyzer-deck-name" class="form-control" [(ngModel)]="deckName" placeholder="My Deck" />
+			</div>
+			<div>
+				<label class="form-label fw-semibold mb-1" for="analyzer-runs">Simulation Runs</label>
+				<input
+					id="analyzer-runs"
+					type="number"
+					min="100"
+					step="100"
+					class="form-control"
+					[(ngModel)]="simulationRuns"
+				/>
+			</div>
+			<div class="form-check form-switch mt-4">
+				<input id="analyzer-on-play" class="form-check-input" type="checkbox" [(ngModel)]="onPlay" />
+				<label class="form-check-label" for="analyzer-on-play">Assume on the play</label>
+			</div>
+		</div>
+
+		<div class="mt-3">
+			<label class="form-label fw-semibold mb-1" for="analyzer-moxfield-url">Moxfield URL</label>
+			<div class="input-group">
+				<input
+					id="analyzer-moxfield-url"
+					class="form-control"
+					[(ngModel)]="moxfieldUrl"
+					placeholder="https://www.moxfield.com/decks/{deckId}"
+				/>
+				<button class="btn btn-outline-primary" (click)="importFromMoxfieldUrl()" [disabled]="isImporting">
+					Import URL
+				</button>
+			</div>
+			<div class="form-text">Imports mainboard cards from a public Moxfield deck.</div>
+		</div>
+
+		<div class="mt-3">
+			<label class="form-label fw-semibold mb-1" for="analyzer-decklist">Decklist</label>
+			<textarea
+				id="analyzer-decklist"
+				class="form-control"
+				rows="8"
+				[(ngModel)]="deckText"
+				placeholder="1 Sol Ring&#10;1 Arcane Signet&#10;35 Plains"
+			></textarea>
+		</div>
+
+		<div class="d-flex flex-wrap gap-2 mt-3">
+			<button class="btn btn-primary" (click)="importDeck()" [disabled]="isImporting">
+				@if (isImporting) {
+					<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+					Importing...
+				} @else {
+					Import Deck
+				}
+			</button>
+			<button
+				class="btn btn-outline-primary"
+				(click)="runSimulation()"
+				[disabled]="!cards.length || isRunningSimulation"
+			>
+				@if (isRunningSimulation) {
+					<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+					Running...
+				} @else {
+					Re-run Simulation
+				}
+			</button>
+		</div>
+
+		@if (analyzerError) {
+			<div class="alert alert-danger mt-3 mb-0 py-2">{{ analyzerError }}</div>
+		}
+	</section>
+
+	@if (cards.length > 0) {
+		<section class="app-surface p-3 p-md-4 mb-4">
+			<h4 class="mb-3">Deck Snapshot</h4>
+			<div class="snapshot-grid">
+				<div class="snapshot-tile">
+					<span class="snapshot-label">Deck Size</span>
+					<strong class="snapshot-value">{{ getDeckSize() }}</strong>
+				</div>
+				<div class="snapshot-tile">
+					<span class="snapshot-label">Lands</span>
+					<strong class="snapshot-value">{{ getLandCount() }}</strong>
+				</div>
+				<div class="snapshot-tile">
+					<span class="snapshot-label">Detected Ramp</span>
+					<strong class="snapshot-value">{{ getRampCount() }}</strong>
+				</div>
+				<div class="snapshot-tile">
+					<span class="snapshot-label">Combo Pieces</span>
+					<strong class="snapshot-value">{{ getComboCount() }}</strong>
+				</div>
+			</div>
+		</section>
+
+		<section class="app-surface p-3 p-md-4 mb-4">
+			<h4 class="mb-2">Combo Piece Selection</h4>
+			<p class="text-secondary small mb-2">Mark cards that should count toward the combo-by-turn odds.</p>
+			<div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+				<button class="btn btn-outline-secondary btn-sm" (click)="autoDetectComboPieces()">
+					Auto-detect Combo Pieces
+				</button>
+				<span class="text-secondary small">Uses oracle-text heuristics, then you can fine-tune manually.</span>
+			</div>
+			<div class="combo-grid">
+				@for (card of cards; track card.name) {
+					<label class="form-check combo-item">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							[(ngModel)]="card.isComboPiece"
+							(change)="runSimulation()"
+						/>
+						<span class="form-check-label">{{ card.count }}x {{ card.name }}</span>
+					</label>
+				}
+			</div>
+		</section>
+
+		<section class="app-surface p-3 p-md-4 mb-4">
+			<h4 class="mb-3">Custom Scenario</h4>
+			<div class="row g-2 align-items-end">
+				<div class="col-md-5">
+					<label class="form-label mb-1" for="custom-label">Label</label>
+					<input id="custom-label" class="form-control" [(ngModel)]="customLabel" />
+				</div>
+				<div class="col-md-3">
+					<label class="form-label mb-1" for="custom-target">Target</label>
+					<select id="custom-target" class="form-select" [(ngModel)]="customTarget">
+						<option value="lands">Lands</option>
+						<option value="ramp">Ramp</option>
+						<option value="combo">Combo pieces</option>
+					</select>
+				</div>
+				<div class="col-md-2">
+					<label class="form-label mb-1" for="custom-count">At least</label>
+					<input id="custom-count" type="number" min="1" class="form-control" [(ngModel)]="customMinCount" />
+				</div>
+				<div class="col-md-2">
+					<label class="form-label mb-1" for="custom-turn">By turn</label>
+					<input id="custom-turn" type="number" min="1" class="form-control" [(ngModel)]="customTurn" />
+				</div>
+			</div>
+			<button class="btn btn-outline-primary mt-3" (click)="runSimulation()">Update Odds</button>
+		</section>
+
+		<section class="app-surface p-3 p-md-4 mb-4">
+			<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+				<h4 class="mb-0">Detected Combos</h4>
+				<button
+					class="btn btn-outline-secondary btn-sm"
+					(click)="refreshDetectedCombos()"
+					[disabled]="isLoadingCombos"
+				>
+					Refresh Combos
+				</button>
+			</div>
+
+			@if (isLoadingCombos) {
+				<div class="text-secondary small d-flex align-items-center gap-2">
+					<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+					Finding combos for this deck...
+				</div>
+			} @else if (comboError) {
+				<div class="alert alert-warning mb-0 py-2">{{ comboError }}</div>
+			} @else if (comboMatches.length === 0) {
+				<p class="text-secondary mb-0">No complete combos detected for current card pool.</p>
+			} @else {
+				<div class="combo-results-list">
+					@for (combo of comboMatches; track combo.id) {
+						<div class="combo-result-card" [class.is-expanded]="expandedComboId === combo.id">
+							<button
+								type="button"
+								class="btn combo-result-row w-100 text-start"
+								(click)="toggleComboDetails(combo.id)"
+								[attr.aria-expanded]="expandedComboId === combo.id"
+							>
+								<div class="combo-result-summary">
+									<div class="combo-result-title">{{ getComboTitle(combo) }}</div>
+								</div>
+								<div class="combo-result-images combo-result-images-collapsed">
+									@for (cardName of combo.cards; track cardName + '-' + $index) {
+										@if (getComboCardImage(combo, cardName); as imageUrl) {
+											<img [src]="imageUrl" [alt]="cardName" class="combo-result-image" />
+										} @else {
+											<span class="combo-result-image combo-result-image-fallback">
+												{{ cardName.charAt(0) }}
+											</span>
+										}
+									}
+								</div>
+							</button>
+
+							@if (expandedComboId === combo.id) {
+								<div class="combo-result-details">
+									@if (combo.result) {
+										<div class="combo-detail-block">
+											<div class="combo-detail-title">Results:</div>
+											<ul class="combo-detail-list">
+												@for (
+													line of getDetailLines(combo.result);
+													track line + '-result-' + $index
+												) {
+													<li>
+														@for (
+															token of getManaTokens(line);
+															track token.type + '-' + token.value + '-' + $index
+														) {
+															@switch (token.type) {
+																@case ('symbol') {
+																	<img
+																		[src]="
+																			'https://svgs.scryfall.io/card-symbols/' +
+																			token.value +
+																			'.svg'
+																		"
+																		alt="{{ token.value }}"
+																		class="combo-mana-symbol"
+																	/>
+																}
+																@case ('linebreak') {
+																	<br />
+																}
+																@default {
+																	<span>{{ token.value }}</span>
+																}
+															}
+														}
+													</li>
+												}
+											</ul>
+										</div>
+									}
+
+									@if (combo.prerequisites) {
+										<div class="combo-detail-block">
+											<div class="combo-detail-title">Prerequisites:</div>
+											<ul class="combo-detail-list">
+												@for (
+													line of getDetailLines(combo.prerequisites);
+													track line + '-prereq-' + $index
+												) {
+													<li>
+														@for (
+															token of getManaTokens(line);
+															track token.type + '-' + token.value + '-' + $index
+														) {
+															@switch (token.type) {
+																@case ('symbol') {
+																	<img
+																		[src]="
+																			'https://svgs.scryfall.io/card-symbols/' +
+																			token.value +
+																			'.svg'
+																		"
+																		alt="{{ token.value }}"
+																		class="combo-mana-symbol"
+																	/>
+																}
+																@case ('linebreak') {
+																	<br />
+																}
+																@default {
+																	<span>{{ token.value }}</span>
+																}
+															}
+														}
+													</li>
+												}
+											</ul>
+										</div>
+									}
+
+									@if (combo.steps) {
+										<div class="combo-detail-block">
+											<div class="combo-detail-title">Steps:</div>
+											<ul class="combo-detail-list">
+												@for (
+													line of getDetailLines(combo.steps);
+													track line + '-steps-' + $index
+												) {
+													<li>
+														@for (
+															token of getManaTokens(line);
+															track token.type + '-' + token.value + '-' + $index
+														) {
+															@switch (token.type) {
+																@case ('symbol') {
+																	<img
+																		[src]="
+																			'https://svgs.scryfall.io/card-symbols/' +
+																			token.value +
+																			'.svg'
+																		"
+																		alt="{{ token.value }}"
+																		class="combo-mana-symbol"
+																	/>
+																}
+																@case ('linebreak') {
+																	<br />
+																}
+																@default {
+																	<span>{{ token.value }}</span>
+																}
+															}
+														}
+													</li>
+												}
+											</ul>
+										</div>
+									}
+								</div>
+							}
+						</div>
+					}
+				</div>
+			}
+		</section>
+	}
+
+	@if (odds) {
+		<section class="app-surface p-3 p-md-4">
+			<h4 class="mb-3">Opening Hand Simulation</h4>
+			<div class="odds-grid">
+				<div class="odds-card">
+					<div class="odds-title">At least 2 lands in opening hand</div>
+					<div class="odds-value">{{ formatPercent(odds.atLeastTwoLandsOpening) }}</div>
+				</div>
+				<div class="odds-card">
+					<div class="odds-title">Ramp by turn 2 (castable)</div>
+					<div class="odds-value">{{ formatPercent(odds.rampByTurnTwo) }}</div>
+				</div>
+				<div class="odds-card">
+					<div class="odds-title">Combo piece by turn 4</div>
+					<div class="odds-value">{{ formatPercent(odds.comboByTurnFour) }}</div>
+				</div>
+				<div class="odds-card">
+					<div class="odds-title">{{ customLabel }}</div>
+					<div class="odds-value">{{ formatPercent(odds.customScenario) }}</div>
+				</div>
+			</div>
+		</section>
+	}
+</div>

@@ -1,0 +1,195 @@
+.analyzer-page .app-surface {
+	border: 1px solid var(--bs-border-color-translucent);
+	border-radius: 14px;
+	background: linear-gradient(180deg, var(--bs-tertiary-bg), var(--bs-body-bg));
+}
+
+.snapshot-grid,
+.odds-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 0.75rem;
+}
+
+.snapshot-tile,
+.odds-card {
+	border: 1px solid var(--bs-border-color-translucent);
+	border-radius: 12px;
+	padding: 0.8rem;
+	background: color-mix(in srgb, var(--bs-body-bg) 94%, transparent);
+}
+
+.snapshot-label,
+.odds-title {
+	display: block;
+	font-size: 0.8rem;
+	color: var(--bs-secondary-color);
+	margin-bottom: 0.25rem;
+}
+
+.snapshot-value,
+.odds-value {
+	font-size: 1.35rem;
+	font-weight: 700;
+}
+
+.combo-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: 0.4rem 0.8rem;
+	max-height: 320px;
+	overflow-y: auto;
+	padding: 0.25rem;
+}
+
+.combo-item {
+	padding: 0.25rem 0.4rem;
+	border-radius: 8px;
+}
+
+.combo-item:hover {
+	background: color-mix(in srgb, var(--bs-primary) 7%, transparent);
+}
+
+.combo-results-list {
+	display: grid;
+	gap: 0.65rem;
+}
+
+.combo-result-card {
+	border: 1px solid var(--bs-border-color-translucent);
+	border-radius: 12px;
+	background: color-mix(in srgb, var(--bs-body-bg) 95%, transparent);
+	overflow: hidden;
+}
+
+.combo-result-row {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1rem;
+	align-items: start;
+	padding: 0.95rem;
+	border: 0;
+	background: transparent;
+	color: inherit;
+}
+
+.combo-result-row:hover {
+	background: color-mix(in srgb, var(--bs-primary) 5%, transparent);
+}
+
+.combo-result-images {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.45rem;
+}
+
+.combo-result-images-collapsed {
+	align-items: flex-start;
+}
+
+.combo-result-image {
+	width: 106px;
+	height: 148px;
+	object-fit: cover;
+	border-radius: 8px;
+	border: 1px solid var(--bs-border-color-translucent);
+	background: var(--bs-tertiary-bg);
+	transition:
+		transform 180ms ease,
+		box-shadow 180ms ease;
+}
+
+.combo-result-card.is-expanded .combo-result-image {
+	width: 256px;
+	height: 357px;
+	transform: scale(1);
+	box-shadow: 0 10px 22px rgb(0 0 0 / 0.26);
+}
+
+.combo-result-image-fallback {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	color: var(--bs-secondary-color);
+	font-size: 1.1rem;
+}
+
+.combo-result-summary {
+	min-width: 0;
+}
+
+.combo-result-title {
+	font-weight: 700;
+	font-size: 1.1rem;
+	line-height: 1.3;
+}
+
+.combo-result-caption {
+	font-size: 0.85rem;
+	color: var(--bs-secondary-color);
+	margin-top: 0.2rem;
+}
+
+.combo-result-details {
+	border-top: 1px solid var(--bs-border-color-translucent);
+	padding: 1rem;
+	display: grid;
+	gap: 1rem;
+	animation: combo-details-enter 180ms ease;
+}
+
+.combo-detail-title {
+	font-size: 1.55rem;
+	font-weight: 700;
+	margin-bottom: 0.4rem;
+}
+
+.combo-detail-body {
+	white-space: pre-wrap;
+	line-height: 1.45;
+}
+
+.combo-detail-list {
+	margin: 0;
+	padding-left: 1.2rem;
+	display: grid;
+	gap: 0.35rem;
+	font-size: 1.2rem;
+	line-height: 1.5;
+	color: var(--bs-secondary-color);
+}
+
+.combo-mana-symbol {
+	width: 17px;
+	height: 17px;
+	vertical-align: text-bottom;
+	margin: 0 1px;
+}
+
+@keyframes combo-details-enter {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 991px) {
+	.combo-result-image {
+		width: 86px;
+		height: 120px;
+	}
+
+	.combo-detail-title {
+		font-size: 1.1rem;
+	}
+
+	.combo-detail-list {
+		font-size: 1rem;
+	}
+}

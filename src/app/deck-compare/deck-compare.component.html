@@ -1,13 +1,13 @@
-<div class="container-fluid mt-4">
-	<div class="row">
+<div class="container-fluid mt-4 app-page">
+	<div class="row import-row">
 		<!-- Left Input Column -->
-		<div class="col-md-6 d-flex flex-column p-3">
-			<div class="mb-4">
+		<div class="col-md-6 d-flex flex-column p-3 import-column">
+			<div class="mb-4 import-panel app-surface">
 				<!-- Tabs -->
 				<div class="btn-group mb-3" role="tablist">
 					<button
 						type="button"
-						class="btn btn-outline-secondary btn-sm"
+						class="btn btn-outline-secondary"
 						[class.active]="leftUseUrl"
 						(click)="leftUseUrl = true"
 					>
@@ -15,7 +15,7 @@
 					</button>
 					<button
 						type="button"
-						class="btn btn-outline-secondary btn-sm"
+						class="btn btn-outline-secondary"
 						[class.active]="!leftUseUrl"
 						(click)="leftUseUrl = false"
 					>
@@ -36,7 +36,7 @@
 						/>
 						<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
 						<button
-							class="btn btn-primary mt-2 btn-sm rounded-pill"
+							class="btn btn-primary mt-2"
 							(click)="importFromUrl(leftDeckUrl, 'left')"
 							[disabled]="leftLoading"
 						>
@@ -52,7 +52,7 @@
 							}
 						</button>
 						@if (leftError) {
-							<div class="alert alert-danger mt-2 mb-0 py-2">{{ leftError }}</div>
+							<div class="alert alert-danger mt-4 mb-0 py-2">{{ leftError }}</div>
 						}
 					</div>
 				}
@@ -71,10 +71,7 @@
 						<div class="form-text">
 							Supports commander exports with the commander at either the top or the bottom of the list.
 						</div>
-						<button
-							class="btn btn-primary mt-3 btn-sm rounded-pill"
-							(click)="processDecklist(leftDeckText, 'left')"
-						>
+						<button class="btn btn-primary mt-3" (click)="processDecklist(leftDeckText, 'left')">
 							Import Deck 1
 						</button>
 					</div>
@@ -83,13 +80,13 @@
 		</div>
 
 		<!-- Right Input Column -->
-		<div class="col-md-6 d-flex flex-column p-3">
-			<div class="mb-4">
+		<div class="col-md-6 d-flex flex-column p-3 import-column">
+			<div class="mb-4 import-panel app-surface">
 				<!-- Tabs -->
 				<div class="btn-group mb-3" role="tablist">
 					<button
 						type="button"
-						class="btn btn-outline-secondary btn-sm"
+						class="btn btn-outline-secondary"
 						[class.active]="rightUseUrl"
 						(click)="rightUseUrl = true"
 					>
@@ -97,7 +94,7 @@
 					</button>
 					<button
 						type="button"
-						class="btn btn-outline-secondary btn-sm"
+						class="btn btn-outline-secondary"
 						[class.active]="!rightUseUrl"
 						(click)="rightUseUrl = false"
 					>
@@ -118,7 +115,7 @@
 						/>
 						<div class="form-text mb-2">Moxfield and Archidekt URLs are supported.</div>
 						<button
-							class="btn btn-primary mt-2 btn-sm rounded-pill"
+							class="btn btn-primary mt-2"
 							(click)="importFromUrl(rightDeckUrl, 'right')"
 							[disabled]="rightLoading"
 						>
@@ -134,7 +131,7 @@
 							}
 						</button>
 						@if (rightError) {
-							<div class="alert alert-danger mt-2 mb-0 py-2">{{ rightError }}</div>
+							<div class="alert alert-danger mt-4 mb-0 py-2">{{ rightError }}</div>
 						}
 					</div>
 				}
@@ -153,10 +150,7 @@
 						<div class="form-text">
 							Supports commander exports with the commander at either the top or the bottom of the list.
 						</div>
-						<button
-							class="btn btn-primary mt-3 btn-sm rounded-pill"
-							(click)="processDecklist(rightDeckText, 'right')"
-						>
+						<button class="btn btn-primary mt-3" (click)="processDecklist(rightDeckText, 'right')">
 							Import Deck 2
 						</button>
 					</div>
@@ -166,10 +160,10 @@
 	</div>
 
 	<!-- Toggle Button Centered Below Inputs -->
-	<div class="d-flex justify-content-center my-3">
+	<div class="d-flex justify-content-center my-3 compare-diff-toggle-wrap">
 		<button
 			type="button"
-			class="btn btn-outline-primary rounded-pill"
+			class="btn btn-outline-primary"
 			[class.active]="showDifferencesOnly"
 			(click)="toggleShowDifferences()"
 			[attr.aria-pressed]="showDifferencesOnly"
@@ -182,8 +176,12 @@
 	<!-- Deck Lists Columns -->
 	<div class="comparison-layout">
 		<div class="comparison-deck-titles d-none d-md-grid">
-			<h5 class="deck-header text-center mb-0">{{ leftDeckTitle }}</h5>
-			<h5 class="deck-header text-center mb-0">{{ rightDeckTitle }}</h5>
+			<div class="deck-header-card">
+				<h5 class="deck-header text-center mb-0" [title]="leftDeckTitle">{{ leftDeckTitle }}</h5>
+			</div>
+			<div class="deck-header-card">
+				<h5 class="deck-header text-center mb-0" [title]="rightDeckTitle">{{ rightDeckTitle }}</h5>
+			</div>
 		</div>
 
 		<div class="d-none d-md-block">
@@ -234,19 +232,52 @@
 									@for (card of getVisibleCardsForGroup('left', group); track card) {
 										<li
 											class="card-item"
+											[class.card-item-unique]="isCardUniqueToSide(card.name, 'left')"
 											(mouseenter)="onCardHover(card.name)"
 											(mouseleave)="onCardLeave()"
 										>
-											<span>{{ card.count }}&emsp;{{ card.name }}</span>
-											@if (group !== 'Sideboard') {
-												<span
-													class="status-circle"
-													[ngClass]="
-														cardExistsOnSide(card.name, 'left')
-															? 'bg-success'
-															: 'bg-warning'
-													"
-												></span>
+											<span class="card-item-name">{{ card.count }}&emsp;{{ card.name }}</span>
+											@if (getCardManaCost(card.name) || getCardPriceLabel(card.name)) {
+												<span class="card-item-cost">
+													@if (getCardManaCost(card.name); as manaCost) {
+														<span
+															class="compare-mana-symbol-list"
+															aria-label="Mana cost {{ manaCost }}"
+														>
+															@for (
+																token of manaCost | manaSymbol;
+																track token.value + '-' + $index
+															) {
+																@switch (token.type) {
+																	@case ('symbol') {
+																		<img
+																			[src]="
+																				'https://svgs.scryfall.io/card-symbols/' +
+																				token.value +
+																				'.svg'
+																			"
+																			alt="{{ token.value }}"
+																			class="compare-mana-symbol"
+																		/>
+																	}
+																	@case ('text') {
+																		<span class="card-item-cost-text">
+																			{{ token.value }}
+																		</span>
+																	}
+																}
+															}
+														</span>
+													}
+													@if (getCardPriceLabel(card.name); as priceLabel) {
+														<span
+															class="card-item-price"
+															aria-label="Current price {{ priceLabel }}"
+														>
+															{{ priceLabel }}
+														</span>
+													}
+												</span>
 											}
 										</li>
 									}
@@ -306,19 +337,52 @@
 									@for (card of getVisibleCardsForGroup('right', group); track card) {
 										<li
 											class="card-item"
+											[class.card-item-unique]="isCardUniqueToSide(card.name, 'right')"
 											(mouseenter)="onCardHover(card.name)"
 											(mouseleave)="onCardLeave()"
 										>
-											<span>{{ card.count }}&emsp;{{ card.name }}</span>
-											@if (group !== 'Sideboard') {
-												<span
-													class="status-circle"
-													[ngClass]="
-														cardExistsOnSide(card.name, 'right')
-															? 'bg-success'
-															: 'bg-warning'
-													"
-												></span>
+											<span class="card-item-name">{{ card.count }}&emsp;{{ card.name }}</span>
+											@if (getCardManaCost(card.name) || getCardPriceLabel(card.name)) {
+												<span class="card-item-cost">
+													@if (getCardManaCost(card.name); as manaCost) {
+														<span
+															class="compare-mana-symbol-list"
+															aria-label="Mana cost {{ manaCost }}"
+														>
+															@for (
+																token of manaCost | manaSymbol;
+																track token.value + '-' + $index
+															) {
+																@switch (token.type) {
+																	@case ('symbol') {
+																		<img
+																			[src]="
+																				'https://svgs.scryfall.io/card-symbols/' +
+																				token.value +
+																				'.svg'
+																			"
+																			alt="{{ token.value }}"
+																			class="compare-mana-symbol"
+																		/>
+																	}
+																	@case ('text') {
+																		<span class="card-item-cost-text">
+																			{{ token.value }}
+																		</span>
+																	}
+																}
+															}
+														</span>
+													}
+													@if (getCardPriceLabel(card.name); as priceLabel) {
+														<span
+															class="card-item-price"
+															aria-label="Current price {{ priceLabel }}"
+														>
+															{{ priceLabel }}
+														</span>
+													}
+												</span>
 											}
 										</li>
 									}
@@ -338,7 +402,10 @@
 
 		<div class="d-md-none comparison-mobile-layout">
 			<div class="comparison-mobile-deck">
-				<h5 class="deck-header text-center mb-0">{{ leftDeckTitle }}</h5>
+				<div class="deck-header-card">
+					<p class="deck-header-kicker mb-1">Deck 1</p>
+					<h5 class="deck-header text-center mb-0" [title]="leftDeckTitle">{{ leftDeckTitle }}</h5>
+				</div>
 				@for (group of getComparisonGroupKeys(); track group) {
 					<div
 						[class.commander]="group === 'Commander'"
@@ -384,17 +451,52 @@
 								@for (card of getVisibleCardsForGroup('left', group); track card) {
 									<li
 										class="card-item"
+										[class.card-item-unique]="isCardUniqueToSide(card.name, 'left')"
 										(mouseenter)="onCardHover(card.name)"
 										(mouseleave)="onCardLeave()"
 									>
-										<span>{{ card.count }}&emsp;{{ card.name }}</span>
-										@if (group !== 'Sideboard') {
-											<span
-												class="status-circle"
-												[ngClass]="
-													cardExistsOnSide(card.name, 'left') ? 'bg-success' : 'bg-warning'
-												"
-											></span>
+										<span class="card-item-name">{{ card.count }}&emsp;{{ card.name }}</span>
+										@if (getCardManaCost(card.name) || getCardPriceLabel(card.name)) {
+											<span class="card-item-cost">
+												@if (getCardManaCost(card.name); as manaCost) {
+													<span
+														class="compare-mana-symbol-list"
+														aria-label="Mana cost {{ manaCost }}"
+													>
+														@for (
+															token of manaCost | manaSymbol;
+															track token.value + '-' + $index
+														) {
+															@switch (token.type) {
+																@case ('symbol') {
+																	<img
+																		[src]="
+																			'https://svgs.scryfall.io/card-symbols/' +
+																			token.value +
+																			'.svg'
+																		"
+																		alt="{{ token.value }}"
+																		class="compare-mana-symbol"
+																	/>
+																}
+																@case ('text') {
+																	<span class="card-item-cost-text">
+																		{{ token.value }}
+																	</span>
+																}
+															}
+														}
+													</span>
+												}
+												@if (getCardPriceLabel(card.name); as priceLabel) {
+													<span
+														class="card-item-price"
+														aria-label="Current price {{ priceLabel }}"
+													>
+														{{ priceLabel }}
+													</span>
+												}
+											</span>
 										}
 									</li>
 								}
@@ -411,7 +513,10 @@
 			</div>
 
 			<div class="comparison-mobile-deck">
-				<h5 class="deck-header text-center mb-0">{{ rightDeckTitle }}</h5>
+				<div class="deck-header-card">
+					<p class="deck-header-kicker mb-1">Deck 2</p>
+					<h5 class="deck-header text-center mb-0" [title]="rightDeckTitle">{{ rightDeckTitle }}</h5>
+				</div>
 				@for (group of getComparisonGroupKeys(); track group) {
 					<div
 						[class.commander]="group === 'Commander'"
@@ -457,17 +562,52 @@
 								@for (card of getVisibleCardsForGroup('right', group); track card) {
 									<li
 										class="card-item"
+										[class.card-item-unique]="isCardUniqueToSide(card.name, 'right')"
 										(mouseenter)="onCardHover(card.name)"
 										(mouseleave)="onCardLeave()"
 									>
-										<span>{{ card.count }}&emsp;{{ card.name }}</span>
-										@if (group !== 'Sideboard') {
-											<span
-												class="status-circle"
-												[ngClass]="
-													cardExistsOnSide(card.name, 'right') ? 'bg-success' : 'bg-warning'
-												"
-											></span>
+										<span class="card-item-name">{{ card.count }}&emsp;{{ card.name }}</span>
+										@if (getCardManaCost(card.name) || getCardPriceLabel(card.name)) {
+											<span class="card-item-cost">
+												@if (getCardManaCost(card.name); as manaCost) {
+													<span
+														class="compare-mana-symbol-list"
+														aria-label="Mana cost {{ manaCost }}"
+													>
+														@for (
+															token of manaCost | manaSymbol;
+															track token.value + '-' + $index
+														) {
+															@switch (token.type) {
+																@case ('symbol') {
+																	<img
+																		[src]="
+																			'https://svgs.scryfall.io/card-symbols/' +
+																			token.value +
+																			'.svg'
+																		"
+																		alt="{{ token.value }}"
+																		class="compare-mana-symbol"
+																	/>
+																}
+																@case ('text') {
+																	<span class="card-item-cost-text">
+																		{{ token.value }}
+																	</span>
+																}
+															}
+														}
+													</span>
+												}
+												@if (getCardPriceLabel(card.name); as priceLabel) {
+													<span
+														class="card-item-price"
+														aria-label="Current price {{ priceLabel }}"
+													>
+														{{ priceLabel }}
+													</span>
+												}
+											</span>
 										}
 									</li>
 								}
@@ -482,6 +622,574 @@
 					</div>
 				}
 			</div>
+		</div>
+	</div>
+
+	<div class="stats-layout mt-4 mb-4">
+		<div class="stats-panel">
+			<div class="stats-panel-header">
+				<div>
+					<p class="stats-panel-label mb-1">Deck 1 Stats</p>
+					<h5 class="mb-0">{{ leftDeckTitle }}</h5>
+				</div>
+			</div>
+
+			@if (hasDeckData('left')) {
+				<div class="stats-grid">
+					<div class="stat-tile">
+						<span class="stat-label">Main Deck</span>
+						<strong class="stat-value">{{ leftDeckStats.totalCards }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Unique Cards</span>
+						<strong class="stat-value">{{ leftDeckStats.uniqueCards }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Lands</span>
+						<strong class="stat-value">{{ leftDeckStats.lands }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Nonlands</span>
+						<strong class="stat-value">{{ leftDeckStats.nonLands }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Sideboard</span>
+						<strong class="stat-value">{{ leftDeckStats.sideboard }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Average MV</span>
+						<strong class="stat-value">{{ formatAverageManaValue(leftDeckStats.averageManaValue) }}</strong>
+					</div>
+				</div>
+
+				<div class="stats-subsection">
+					<span class="stats-subsection-title">Color Identity</span>
+					<div class="stats-pill-list">
+						@if (leftDeckStats.colorIdentity.length > 0) {
+							@for (colorCode of leftDeckStats.colorIdentity; track colorCode) {
+								<span
+									class="stats-pill stats-pill-color"
+									[attr.data-color]="colorCode"
+									[attr.title]="getColorLabel(colorCode)"
+								>
+									<img
+										[src]="'https://svgs.scryfall.io/card-symbols/' + colorCode + '.svg'"
+										alt="{{ getColorLabel(colorCode) }}"
+										class="color-identity-symbol"
+									/>
+									<span class="color-identity-count">{{ leftDeckStats.colorCounts[colorCode] }}</span>
+								</span>
+							}
+						} @else {
+							<span class="stats-pill text-secondary">Colorless / unavailable</span>
+						}
+					</div>
+				</div>
+
+				<div class="stats-subsection">
+					<span class="stats-subsection-title">Type Mix</span>
+					<div class="stats-pill-list">
+						@for (entry of leftDeckStats.typeBreakdown; track entry.label) {
+							<span class="stats-pill">{{ entry.label }} {{ entry.count }}</span>
+						}
+					</div>
+				</div>
+			} @else {
+				<p class="stats-empty-state mb-0">Import a deck to see counts, colors, and mana stats.</p>
+			}
+		</div>
+
+		<div class="stats-panel">
+			<div class="stats-panel-header">
+				<div>
+					<p class="stats-panel-label mb-1">Deck 2 Stats</p>
+					<h5 class="mb-0">{{ rightDeckTitle }}</h5>
+				</div>
+			</div>
+
+			@if (hasDeckData('right')) {
+				<div class="stats-grid">
+					<div class="stat-tile">
+						<span class="stat-label">Main Deck</span>
+						<strong class="stat-value">{{ rightDeckStats.totalCards }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Unique Cards</span>
+						<strong class="stat-value">{{ rightDeckStats.uniqueCards }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Lands</span>
+						<strong class="stat-value">{{ rightDeckStats.lands }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Nonlands</span>
+						<strong class="stat-value">{{ rightDeckStats.nonLands }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Sideboard</span>
+						<strong class="stat-value">{{ rightDeckStats.sideboard }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Average MV</span>
+						<strong class="stat-value">
+							{{ formatAverageManaValue(rightDeckStats.averageManaValue) }}
+						</strong>
+					</div>
+				</div>
+
+				<div class="stats-subsection">
+					<span class="stats-subsection-title">Color Identity</span>
+					<div class="stats-pill-list">
+						@if (rightDeckStats.colorIdentity.length > 0) {
+							@for (colorCode of rightDeckStats.colorIdentity; track colorCode) {
+								<span
+									class="stats-pill stats-pill-color"
+									[attr.data-color]="colorCode"
+									[attr.title]="getColorLabel(colorCode)"
+								>
+									<img
+										[src]="'https://svgs.scryfall.io/card-symbols/' + colorCode + '.svg'"
+										alt="{{ getColorLabel(colorCode) }}"
+										class="color-identity-symbol"
+									/>
+									<span class="color-identity-count">
+										{{ rightDeckStats.colorCounts[colorCode] }}
+									</span>
+								</span>
+							}
+						} @else {
+							<span class="stats-pill text-secondary">Colorless / unavailable</span>
+						}
+					</div>
+				</div>
+
+				<div class="stats-subsection">
+					<span class="stats-subsection-title">Type Mix</span>
+					<div class="stats-pill-list">
+						@for (entry of rightDeckStats.typeBreakdown; track entry.label) {
+							<span class="stats-pill">{{ entry.label }} {{ entry.count }}</span>
+						}
+					</div>
+				</div>
+			} @else {
+				<p class="stats-empty-state mb-0">Import a deck to see counts, colors, and mana stats.</p>
+			}
+		</div>
+	</div>
+
+	<div class="legality-layout mb-4">
+		@if (hasCommanderIdentityComparison()) {
+			<div
+				class="commander-identity-compare"
+				[class.commander-identity-compare-mismatch]="isCommanderIdentityMismatch()"
+			>
+				<div class="commander-identity-compare-header">
+					<span class="stats-subsection-title mb-0">Commander Identity Match</span>
+					@if (isCommanderIdentityMismatch()) {
+						<strong class="commander-identity-status">Mismatch detected</strong>
+					} @else {
+						<strong class="commander-identity-status">Match</strong>
+					}
+				</div>
+
+				@if (isCommanderIdentityMismatch()) {
+					<div class="commander-identity-diff-grid">
+						<div class="commander-identity-diff-side">
+							<div class="commander-identity-diff-label">Only in {{ leftDeckTitle }}</div>
+							<div class="stats-pill-list">
+								@if (getCommanderIdentityExclusiveColors('left').length > 0) {
+									@for (colorCode of getCommanderIdentityExclusiveColors('left'); track colorCode) {
+										<span
+											class="stats-pill stats-pill-color"
+											[attr.data-color]="colorCode"
+											[attr.title]="getColorLabel(colorCode)"
+										>
+											<img
+												[src]="'https://svgs.scryfall.io/card-symbols/' + colorCode + '.svg'"
+												alt="{{ getColorLabel(colorCode) }}"
+												class="color-identity-symbol"
+											/>
+											<span class="color-identity-code">{{ colorCode }}</span>
+										</span>
+									}
+								} @else {
+									<span class="stats-pill text-secondary">None</span>
+								}
+							</div>
+						</div>
+
+						<div class="commander-identity-diff-side">
+							<div class="commander-identity-diff-label">Only in {{ rightDeckTitle }}</div>
+							<div class="stats-pill-list">
+								@if (getCommanderIdentityExclusiveColors('right').length > 0) {
+									@for (colorCode of getCommanderIdentityExclusiveColors('right'); track colorCode) {
+										<span
+											class="stats-pill stats-pill-color"
+											[attr.data-color]="colorCode"
+											[attr.title]="getColorLabel(colorCode)"
+										>
+											<img
+												[src]="'https://svgs.scryfall.io/card-symbols/' + colorCode + '.svg'"
+												alt="{{ getColorLabel(colorCode) }}"
+												class="color-identity-symbol"
+											/>
+											<span class="color-identity-code">{{ colorCode }}</span>
+										</span>
+									}
+								} @else {
+									<span class="stats-pill text-secondary">None</span>
+								}
+							</div>
+						</div>
+					</div>
+				} @else {
+					<div class="commander-identity-match-text">Both decks share the same commander color identity.</div>
+				}
+			</div>
+		}
+
+		<div class="legality-panel">
+			<div class="stats-panel-header">
+				<div>
+					<p class="stats-panel-label mb-1">Commander Legality</p>
+					<h5 class="mb-0">{{ leftDeckTitle }}</h5>
+				</div>
+			</div>
+
+			@if (hasDeckData('left')) {
+				<div class="stats-grid legality-issues-grid">
+					<div class="stat-tile">
+						<span class="stat-label">Issues Found</span>
+						<strong class="stat-value">{{ getLegalityIssueCount('left') }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Banned / Illegal</span>
+						<strong class="stat-value">{{ leftDeckLegality.bannedCards.length }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Count Warnings</span>
+						<strong class="stat-value">{{ leftDeckLegality.suspiciousCounts.length }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Off-Color</span>
+						<strong class="stat-value">{{ leftDeckLegality.offColorCards.length }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Commander Issues</span>
+						<strong class="stat-value">{{ leftDeckLegality.illegalCommanders.length }}</strong>
+					</div>
+				</div>
+
+				<div class="stats-subsection">
+					<span class="stats-subsection-title">Commander Color Identity</span>
+					<div class="stats-pill-list">
+						@if (leftDeckLegality.commanderColorIdentity.length > 0) {
+							@for (colorCode of leftDeckLegality.commanderColorIdentity; track colorCode) {
+								<span
+									class="stats-pill stats-pill-color"
+									[attr.data-color]="colorCode"
+									[attr.title]="getColorLabel(colorCode)"
+								>
+									<img
+										[src]="'https://svgs.scryfall.io/card-symbols/' + colorCode + '.svg'"
+										alt="{{ getColorLabel(colorCode) }}"
+										class="color-identity-symbol"
+									/>
+									<span class="color-identity-code">{{ colorCode }}</span>
+								</span>
+							}
+						} @else {
+							<span class="stats-pill text-secondary">Unavailable until commander is identified</span>
+						}
+					</div>
+				</div>
+
+				@if (!hasLegalityFindings('left')) {
+					<p class="legality-success-state mb-0">No Commander legality issues detected.</p>
+				} @else {
+					<div class="legality-list-grid">
+						<div class="legality-list-section">
+							<span class="stats-subsection-title">Banned / Illegal Cards</span>
+							@if (leftDeckLegality.bannedCards.length > 0) {
+								<ul class="legality-list">
+									@for (issue of leftDeckLegality.bannedCards; track issue.name + issue.details) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+								</ul>
+							} @else {
+								<p class="stats-empty-state mb-0">No banned or otherwise illegal cards found.</p>
+							}
+						</div>
+
+						<div class="legality-list-section">
+							<span class="stats-subsection-title">Suspicious Counts</span>
+							@if (leftDeckLegality.suspiciousCounts.length > 0) {
+								<ul class="legality-list">
+									@for (
+										issue of leftDeckLegality.suspiciousCounts;
+										track issue.name + issue.details
+									) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+								</ul>
+							} @else {
+								<p class="stats-empty-state mb-0">Copy counts look consistent for Commander.</p>
+							}
+						</div>
+
+						<div class="legality-list-section legality-list-section-wide">
+							<span class="stats-subsection-title">Commander and Color Identity</span>
+							@if (
+								leftDeckLegality.illegalCommanders.length > 0 ||
+								leftDeckLegality.offColorCards.length > 0
+							) {
+								<ul class="legality-list">
+									@for (
+										issue of leftDeckLegality.illegalCommanders;
+										track issue.name + issue.details
+									) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+									@for (issue of leftDeckLegality.offColorCards; track issue.name + issue.details) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+								</ul>
+							} @else {
+								<p class="stats-empty-state mb-0">Commander rules and color identity look valid.</p>
+							}
+						</div>
+					</div>
+				}
+			} @else {
+				<p class="stats-empty-state mb-0">Import a deck to evaluate Commander legality.</p>
+			}
+		</div>
+
+		<div class="legality-panel">
+			<div class="stats-panel-header">
+				<div>
+					<p class="stats-panel-label mb-1">Commander Legality</p>
+					<h5 class="mb-0">{{ rightDeckTitle }}</h5>
+				</div>
+			</div>
+
+			@if (hasDeckData('right')) {
+				<div class="stats-grid legality-issues-grid">
+					<div class="stat-tile">
+						<span class="stat-label">Issues Found</span>
+						<strong class="stat-value">{{ getLegalityIssueCount('right') }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Banned / Illegal</span>
+						<strong class="stat-value">{{ rightDeckLegality.bannedCards.length }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Count Warnings</span>
+						<strong class="stat-value">{{ rightDeckLegality.suspiciousCounts.length }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Off-Color</span>
+						<strong class="stat-value">{{ rightDeckLegality.offColorCards.length }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Commander Issues</span>
+						<strong class="stat-value">{{ rightDeckLegality.illegalCommanders.length }}</strong>
+					</div>
+				</div>
+
+				<div class="stats-subsection">
+					<span class="stats-subsection-title">Commander Color Identity</span>
+					<div class="stats-pill-list">
+						@if (rightDeckLegality.commanderColorIdentity.length > 0) {
+							@for (colorCode of rightDeckLegality.commanderColorIdentity; track colorCode) {
+								<span
+									class="stats-pill stats-pill-color"
+									[attr.data-color]="colorCode"
+									[attr.title]="getColorLabel(colorCode)"
+								>
+									<img
+										[src]="'https://svgs.scryfall.io/card-symbols/' + colorCode + '.svg'"
+										alt="{{ getColorLabel(colorCode) }}"
+										class="color-identity-symbol"
+									/>
+									<span class="color-identity-code">{{ colorCode }}</span>
+								</span>
+							}
+						} @else {
+							<span class="stats-pill text-secondary">Unavailable until commander is identified</span>
+						}
+					</div>
+				</div>
+
+				@if (!hasLegalityFindings('right')) {
+					<p class="legality-success-state mb-0">No Commander legality issues detected.</p>
+				} @else {
+					<div class="legality-list-grid">
+						<div class="legality-list-section">
+							<span class="stats-subsection-title">Banned / Illegal Cards</span>
+							@if (rightDeckLegality.bannedCards.length > 0) {
+								<ul class="legality-list">
+									@for (issue of rightDeckLegality.bannedCards; track issue.name + issue.details) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+								</ul>
+							} @else {
+								<p class="stats-empty-state mb-0">No banned or otherwise illegal cards found.</p>
+							}
+						</div>
+
+						<div class="legality-list-section">
+							<span class="stats-subsection-title">Suspicious Counts</span>
+							@if (rightDeckLegality.suspiciousCounts.length > 0) {
+								<ul class="legality-list">
+									@for (
+										issue of rightDeckLegality.suspiciousCounts;
+										track issue.name + issue.details
+									) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+								</ul>
+							} @else {
+								<p class="stats-empty-state mb-0">Copy counts look consistent for Commander.</p>
+							}
+						</div>
+
+						<div class="legality-list-section legality-list-section-wide">
+							<span class="stats-subsection-title">Commander and Color Identity</span>
+							@if (
+								rightDeckLegality.illegalCommanders.length > 0 ||
+								rightDeckLegality.offColorCards.length > 0
+							) {
+								<ul class="legality-list">
+									@for (
+										issue of rightDeckLegality.illegalCommanders;
+										track issue.name + issue.details
+									) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+									@for (issue of rightDeckLegality.offColorCards; track issue.name + issue.details) {
+										<li class="legality-list-item">
+											<span>{{ issue.name }}</span>
+											<span class="legality-list-meta">{{ issue.details }}</span>
+										</li>
+									}
+								</ul>
+							} @else {
+								<p class="stats-empty-state mb-0">Commander rules and color identity look valid.</p>
+							}
+						</div>
+					</div>
+				}
+			} @else {
+				<p class="stats-empty-state mb-0">Import a deck to evaluate Commander legality.</p>
+			}
+		</div>
+	</div>
+
+	<div class="price-layout mb-4">
+		<div class="price-panel">
+			<div class="stats-panel-header">
+				<div>
+					<p class="stats-panel-label mb-1">Deck Price</p>
+					<h5 class="mb-0">{{ leftDeckTitle }}</h5>
+				</div>
+			</div>
+
+			@if (hasDeckData('left')) {
+				<div class="stats-grid price-grid">
+					<div class="stat-tile">
+						<span class="stat-label">Current Total</span>
+						<strong class="stat-value">{{ formatUsd(leftDeckPrice.totalPriceUsd) }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Cheapest Print Total</span>
+						<strong class="stat-value">{{ formatUsd(leftDeckPrice.cheapestPrintTotalUsd) }}</strong>
+					</div>
+				</div>
+
+				@if (leftDeckPrice.missingCurrentPriceCards > 0 || leftDeckPrice.missingCheapestPriceCards > 0) {
+					<div class="price-note">
+						@if (leftDeckPrice.missingCurrentPriceCards > 0) {
+							<div>{{ leftDeckPrice.missingCurrentPriceCards }} cards missing current pricing.</div>
+						}
+						@if (leftDeckPrice.missingCheapestPriceCards > 0) {
+							<div>
+								{{ leftDeckPrice.missingCheapestPriceCards }} cards missing cheapest-print pricing.
+							</div>
+						}
+					</div>
+				}
+			} @else {
+				<p class="stats-empty-state mb-0">Import a deck to estimate deck cost.</p>
+			}
+		</div>
+
+		<div class="price-comparison-panel">
+			<p class="stats-panel-label mb-1">Price Delta</p>
+			<h5 class="mb-2">{{ leftDeckTitle }} vs {{ rightDeckTitle }}</h5>
+			<div class="price-delta-value">{{ formatUsdDelta(getDeckPriceDelta('current')) }}</div>
+			<div class="price-delta-caption">Current total difference</div>
+			<div class="price-delta-secondary">
+				Cheapest print delta: {{ formatUsdDelta(getDeckPriceDelta('cheapest')) }}
+			</div>
+		</div>
+
+		<div class="price-panel">
+			<div class="stats-panel-header">
+				<div>
+					<p class="stats-panel-label mb-1">Deck Price</p>
+					<h5 class="mb-0">{{ rightDeckTitle }}</h5>
+				</div>
+			</div>
+
+			@if (hasDeckData('right')) {
+				<div class="stats-grid price-grid">
+					<div class="stat-tile">
+						<span class="stat-label">Current Total</span>
+						<strong class="stat-value">{{ formatUsd(rightDeckPrice.totalPriceUsd) }}</strong>
+					</div>
+					<div class="stat-tile">
+						<span class="stat-label">Cheapest Print Total</span>
+						<strong class="stat-value">{{ formatUsd(rightDeckPrice.cheapestPrintTotalUsd) }}</strong>
+					</div>
+				</div>
+
+				@if (rightDeckPrice.missingCurrentPriceCards > 0 || rightDeckPrice.missingCheapestPriceCards > 0) {
+					<div class="price-note">
+						@if (rightDeckPrice.missingCurrentPriceCards > 0) {
+							<div>{{ rightDeckPrice.missingCurrentPriceCards }} cards missing current pricing.</div>
+						}
+						@if (rightDeckPrice.missingCheapestPriceCards > 0) {
+							<div>
+								{{ rightDeckPrice.missingCheapestPriceCards }} cards missing cheapest-print pricing.
+							</div>
+						}
+					</div>
+				}
+			} @else {
+				<p class="stats-empty-state mb-0">Import a deck to estimate deck cost.</p>
+			}
 		</div>
 	</div>
 

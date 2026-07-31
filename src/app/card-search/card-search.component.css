@@ -6,6 +6,43 @@
 	gap: 1.5rem;
 }
 
+.advanced-search-panel,
+.search-results-panel {
+	background: linear-gradient(180deg, var(--bs-tertiary-bg), var(--bs-body-bg));
+	border-color: var(--bs-border-color-translucent) !important;
+	box-shadow: 0 8px 20px rgb(0 0 0 / 0.06);
+}
+
+.advanced-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.8rem 1rem;
+}
+
+.preset-panel {
+	border-color: var(--bs-border-color-translucent) !important;
+}
+
+.result-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 0.65rem;
+}
+
+.result-item {
+	border: 1px solid var(--bs-border-color-translucent);
+	border-radius: 12px;
+	padding: 0.7rem 0.8rem;
+	background: color-mix(in srgb, var(--bs-body-bg) 95%, transparent);
+	color: var(--bs-body-color);
+}
+
+.result-item.result-item-selected {
+	border-color: rgba(var(--bs-primary-rgb), 0.5);
+	background-color: rgba(var(--bs-primary-rgb), 0.18);
+	color: var(--bs-body-color);
+}
+
 /* Card image */
 .card-image-wrapper {
 	flex: 1 1 300px;
@@ -84,6 +121,10 @@
 
 /* Smooth responsive stacking */
 @media (max-width: 992px) {
+	.advanced-grid {
+		grid-template-columns: 1fr;
+	}
+
 	.card-container {
 		flex-direction: column;
 		align-items: center;

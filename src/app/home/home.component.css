@@ -1,0 +1,15 @@
+.home-page {
+	max-width: 1080px;
+}
+
+.home-hero {
+	border-radius: 22px;
+}
+
+.home-feature-card {
+	border-radius: 16px;
+}
+
+.home-cta .btn {
+	min-width: 148px;
+}

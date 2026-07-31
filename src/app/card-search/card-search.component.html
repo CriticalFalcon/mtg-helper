@@ -1,7 +1,218 @@
 <div class="container mt-5">
+	<div id="advanced-search" class="advanced-search-panel border rounded-4 p-3 p-md-4 mb-4">
+		<div class="d-flex flex-wrap align-items-end gap-2 mb-3">
+			<div class="flex-grow-1">
+				<label for="card-search-term" class="form-label fw-semibold mb-1">Card Name</label>
+				<input
+					id="card-search-term"
+					type="text"
+					class="form-control"
+					[(ngModel)]="searchTerm"
+					placeholder="e.g. Lightning Bolt"
+				/>
+			</div>
+			<button class="btn btn-primary" (click)="searchCard()" [disabled]="isSearching">
+				@if (isSearching) {
+					<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+					Searching...
+				} @else {
+					Search Cards
+				}
+			</button>
+			<button class="btn btn-outline-secondary" (click)="clearFilters()">Reset Filters</button>
+		</div>
+
+		<div class="advanced-grid">
+			<div>
+				<label class="form-label fw-semibold mb-1">Colors</label>
+				<div class="d-flex flex-wrap gap-2 mb-2">
+					@for (color of colorOptions; track color) {
+						<button
+							type="button"
+							class="btn btn-sm"
+							[class.btn-primary]="isColorSelected(color)"
+							[class.btn-outline-secondary]="!isColorSelected(color)"
+							(click)="toggleColor(color)"
+						>
+							{{ color }}
+						</button>
+					}
+				</div>
+				<select class="form-select" [(ngModel)]="advancedFilters.colorMode">
+					<option value="includes">Includes selected colors</option>
+					<option value="exact">Exactly selected colors</option>
+					<option value="any">Any selected color</option>
+				</select>
+			</div>
+
+			<div>
+				<label class="form-label fw-semibold mb-1">Mana Value</label>
+				<div class="d-flex gap-2">
+					<input
+						type="number"
+						class="form-control"
+						[(ngModel)]="advancedFilters.manaValueMin"
+						placeholder="Min"
+					/>
+					<input
+						type="number"
+						class="form-control"
+						[(ngModel)]="advancedFilters.manaValueMax"
+						placeholder="Max"
+					/>
+				</div>
+			</div>
+
+			<div>
+				<label class="form-label fw-semibold mb-1">Type</label>
+				<input
+					type="text"
+					class="form-control"
+					[(ngModel)]="advancedFilters.typeQuery"
+					placeholder="e.g. Creature, Artifact"
+				/>
+			</div>
+
+			<div>
+				<label class="form-label fw-semibold mb-1">Oracle Text</label>
+				<input
+					type="text"
+					class="form-control"
+					[(ngModel)]="advancedFilters.oracleQuery"
+					placeholder="e.g. draw a card"
+				/>
+			</div>
+
+			<div>
+				<label class="form-label fw-semibold mb-1">Legality</label>
+				<div class="d-flex gap-2">
+					<select class="form-select" [(ngModel)]="advancedFilters.legalityFormat">
+						<option value="">Any format</option>
+						@for (format of legalityFormats; track format) {
+							<option [value]="format">{{ format }}</option>
+						}
+					</select>
+					<select class="form-select" [(ngModel)]="advancedFilters.legalityState">
+						<option value="legal">Legal</option>
+						<option value="not_legal">Not legal</option>
+						<option value="banned">Banned</option>
+						<option value="restricted">Restricted</option>
+					</select>
+				</div>
+			</div>
+
+			<div>
+				<label class="form-label fw-semibold mb-1">Set</label>
+				<input type="text" class="form-control" [(ngModel)]="advancedFilters.setCode" placeholder="e.g. mh3" />
+			</div>
+
+			<div>
+				<label class="form-label fw-semibold mb-1">Rarity</label>
+				<select class="form-select" [(ngModel)]="advancedFilters.rarity">
+					<option value="">Any rarity</option>
+					@for (rarity of rarityOptions; track rarity) {
+						<option [value]="rarity">{{ rarity }}</option>
+					}
+				</select>
+			</div>
+
+			<div>
+				<label class="form-label fw-semibold mb-1">USD Price</label>
+				<div class="d-flex gap-2">
+					<input
+						type="number"
+						class="form-control"
+						[(ngModel)]="advancedFilters.priceMin"
+						placeholder="Min"
+						step="0.01"
+					/>
+					<input
+						type="number"
+						class="form-control"
+						[(ngModel)]="advancedFilters.priceMax"
+						placeholder="Max"
+						step="0.01"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<div class="preset-panel mt-3 pt-3 border-top">
+			<div class="d-flex flex-wrap align-items-end gap-2">
+				<div>
+					<label for="preset-name" class="form-label mb-1">Preset Name</label>
+					<input
+						id="preset-name"
+						type="text"
+						class="form-control"
+						[(ngModel)]="presetName"
+						placeholder="e.g. Budget Dimir Removal"
+					/>
+				</div>
+				<button class="btn btn-outline-primary" (click)="saveCurrentPreset()">Save Preset</button>
+
+				<div class="ms-md-3">
+					<label for="preset-select" class="form-label mb-1">Saved Presets</label>
+					<select
+						id="preset-select"
+						class="form-select"
+						[(ngModel)]="selectedPresetName"
+						(change)="applyPreset(selectedPresetName)"
+					>
+						<option value="">Select a preset</option>
+						@for (preset of savedPresets; track preset.name) {
+							<option [value]="preset.name">{{ preset.name }}</option>
+						}
+					</select>
+				</div>
+
+				<button
+					class="btn btn-outline-danger"
+					[disabled]="!selectedPresetName"
+					(click)="deletePreset(selectedPresetName)"
+				>
+					Delete Preset
+				</button>
+			</div>
+
+			@if (presetMessage) {
+				<div class="form-text mt-2">{{ presetMessage }}</div>
+			}
+		</div>
+	</div>
+
+	@if (searchResults.length > 0) {
+		<div class="search-results-panel border rounded-4 p-3 mb-4">
+			<h5 class="mb-3">Results</h5>
+			<div class="result-grid">
+				@for (result of searchResults; track result.id) {
+					<button
+						type="button"
+						class="btn result-item text-start"
+						[class.result-item-selected]="selectedCardId === result.id"
+						(click)="selectCard(result)"
+					>
+						<div class="fw-semibold">{{ result.name }}</div>
+						<div class="small text-secondary">{{ result.type_line || 'Unknown type' }}</div>
+						<div class="small text-secondary text-capitalize">
+							{{ result.set_name || 'Unknown set' }}
+							@if (result.rarity) {
+								- {{ result.rarity }}
+							}
+							@if (result.prices; as prices) {
+								@if (prices.usd) {
+									- ${{ prices.usd }}
+								}
+							}
+						</div>
+					</button>
+				}
+			</div>
+		</div>
+	}
+
 	@if (!cardImage && !cardName && !errorMessage) {
 		<div class="text-center">
-			<h2 class="mb-4">Find any Magic card</h2>
 			<p class="text-muted">
 				Use the search box at the top to explore cards, check details, and see all available prints.
 			</p>

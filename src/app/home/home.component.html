@@ -1,14 +1,15 @@
-<div class="text-center mt-5">
-	<h1 class="display-4">MTG Helper</h1>
-	<p class="lead">Find cards, build decks, and compare lines of play all in one place.</p>
-	<p class="text-muted">Quick, interactive deck analysis tailored to Magic: The Gathering players.</p>
-</div>
-<div class="container mt-5">
-	<section class="mb-5">
-		<h2 class="mb-4">Features</h2>
-		<div class="row g-4">
+<div class="container home-page mt-5 mb-5">
+	<section class="app-surface home-hero p-4 p-md-5 mb-4 text-center">
+		<h1 class="display-5 fw-bold mb-3">MTG Helper</h1>
+		<p class="lead mb-2">Find cards, build decks, and compare lines of play all in one place.</p>
+		<p class="text-muted mb-0">Quick, interactive deck analysis tailored to Magic: The Gathering players.</p>
+	</section>
+
+	<section class="mb-4">
+		<h2 class="mb-3">Features</h2>
+		<div class="row g-3">
 			<div class="col-md-6">
-				<div class="p-3 border-start border-primary border-3">
+				<div class="app-surface home-feature-card p-3 p-md-4 h-100">
 					<h4>Card Search</h4>
 					<p class="text-muted mb-0">
 						Search by name, set, type, cost, and more. Get instant card details and insights.
@@ -16,7 +17,16 @@
 				</div>
 			</div>
 			<div class="col-md-6">
-				<div class="p-3 border-start border-primary border-3">
+				<div class="app-surface home-feature-card p-3 p-md-4 h-100">
+					<h4>Deck Analyzer</h4>
+					<p class="text-muted mb-0">
+						Analyze one deck at a time with opening-hand simulation for lands, ramp, combo pieces, and
+						custom odds.
+					</p>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="app-surface home-feature-card p-3 p-md-4 h-100">
 					<h4>Deck Compare</h4>
 					<p class="text-muted mb-0">
 						Compare decks side-by-side. Analyze overlap, curves, colors, and balance.
@@ -26,9 +36,9 @@
 		</div>
 	</section>
 
-	<section class="mb-5">
-		<h2 class="mb-4">Getting started</h2>
-		<ol class="text-muted">
+	<section class="app-surface p-3 p-md-4 mb-4">
+		<h2 class="mb-3">Getting started</h2>
+		<ol class="text-muted mb-0">
 			<li>Search for cards using your favorite filters</li>
 			<li>Build or import two decks to compare</li>
 			<li>Review stats and make tuning decisions</li>
@@ -36,10 +46,11 @@
 		</ol>
 	</section>
 
-	<section>
-		<h2 class="mb-4">Start exploring</h2>
-		<div class="d-flex gap-3">
+	<section class="app-surface p-3 p-md-4">
+		<h2 class="mb-3">Start exploring</h2>
+		<div class="d-flex flex-wrap gap-3 home-cta">
 			<button routerLink="/card" class="btn btn-primary">Card Search</button>
+			<button routerLink="/analyzer" class="btn btn-outline-primary">Deck Analyzer</button>
 			<button routerLink="/compare" class="btn btn-outline-primary">Deck Compare</button>
 		</div>
 	</section>
